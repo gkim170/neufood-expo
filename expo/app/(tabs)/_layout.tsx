@@ -13,7 +13,7 @@ const TabsLayout = () => {
         screenOptions={{ 
             headerShown: false, 
             // passing this color into the icon below
-            tabBarActiveTintColor: Colors.darkGreen,
+            tabBarActiveTintColor: Colors.darkerGreen,
             tabBarStyle: {
                 backgroundColor: Colors.primaryBackground, // Set your desired background color
                 height: 85, 
