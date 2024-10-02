@@ -4,11 +4,11 @@
     "slug": "neufood",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo-background.png",
+    "icon": "./assets/images/logo/logo-background.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/logo-transparent.png",
+      "image": "./assets/images/logo/logo-transparent.png",
       "resizeMode": "contain",
       "imageScaleMode": "scale",
       "backgroundColor": "#FAF6EB"

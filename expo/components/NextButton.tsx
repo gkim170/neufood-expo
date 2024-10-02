@@ -1,3 +1,6 @@
+// Not using for anything at the moment 
+// But a custom right-arrow button component that can be resused
+
 import { TouchableOpacity, Text } from 'react-native'
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
