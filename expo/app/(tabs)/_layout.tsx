@@ -12,25 +12,24 @@ const TabsLayout = () => {
     <Tabs 
         screenOptions={{ 
             headerShown: false, 
-            // passing this color into the icon below
-            tabBarActiveTintColor: Colors.darkGreen,
+            tabBarActiveTintColor: Colors.darkerGreen, // Sets the color for the current clicked tab's icon and label
             tabBarStyle: {
                 backgroundColor: Colors.primaryBackground, // Set your desired background color
-                height: 85, 
-                paddingBottom: 20,
+                height: 85, // Height of the tab bar
+                paddingBottom: 20, // Padding at the bottom for spacing
             },
         }}
     >
         <Tabs.Screen 
-            name="home" 
+            name="home" // Name of the file referencing
             options={{ 
-                tabBarLabel: "Home",
-                // destructure color passing in the arrow function so we can pass it into the icon
-                tabBarIcon: ({ color }) =>
+                tabBarLabel: "Home", // What shows up for the tab label underneath the icon
+                tabBarIcon: ({ color }) => // destructure color passing in the arrow function so we can pass it into the icon
+                // Tab icon imported above
                 <Ionicons 
-                    name="home-outline" 
-                    size={30} 
-                    color={color} 
+                    name="home-outline" // Icon name for the Home tab as defined in expo/vector-icons, can be found on website
+                    size={30} // Size of icon
+                    color={color} // Color of icon passed dynamically from the screenOptions
                 />
             }}
         />

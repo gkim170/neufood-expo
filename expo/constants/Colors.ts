@@ -10,6 +10,7 @@ export const Colors = {
   primaryBackground: "#FAF6EB", 
   primaryGreen: "#C4D2A6",
   darkGreen: "#859860",
+  darkerGreen: "#06402B",
   primaryPink: "#F2D3C0",
   text: "000000",
   // light: {

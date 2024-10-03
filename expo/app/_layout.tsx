@@ -2,31 +2,16 @@
 
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { StatusBar } from 'expo-status-bar';
 
 export default function RootLayout() {
     return (
+        // SafeAreaProvider ensures content is shown within safe areas on a device
         <SafeAreaProvider>
             <Stack>
-                <Stack.Screen
-                    name="info1"
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="info2"
-                    options={{ headerShown: false }}
-                />
-               <Stack.Screen
-                    name="info3"
-                    options={{ headerShown: false }}
-                />
-               <Stack.Screen
-                    name="info4"
-                    options={{ headerShown: false }}
-                />
+                {/* Tabs will be shown on top of index.tsx */}
                 <Stack.Screen
                     name="(tabs)"
-                    options={{ headerShown: false }}
+                    options={{ headerShown: false }} // Hides the header for the tab layout screen
                 />
                 <Stack.Screen
                     name="index"
