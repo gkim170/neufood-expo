@@ -4,7 +4,7 @@ import React from 'react'
 const pantries = () => {
   return (
     <View className="flex-1 justify-center items-center bg-custom-background font-bold text-2xl">
-      <Text>pantries</Text>
+      <Text>pantrijhbbuiues</Text>
     </View>
   );
 };
