@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 
 const home = () => {
+  // Used to make sure we get here correctly (for testing), can see this log in the terminal
   useEffect(() => {
     console.log('HomeScreen rendered');
   }, []);
