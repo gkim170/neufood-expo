@@ -4,6 +4,8 @@ import { Tabs } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { MaterialCommunityIcons, Entypo } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import CustomHeader from '../../components/CustomHeader';
+import Images from '@/constants/images'; 
 
 
 
@@ -11,7 +13,7 @@ const TabsLayout = () => {
   return (
     <Tabs 
         screenOptions={{ 
-            headerShown: false, 
+            // headerShown: false, 
             tabBarActiveTintColor: Colors.darkerGreen, // Sets the color for the current clicked tab's icon and label
             tabBarStyle: {
                 backgroundColor: Colors.primaryBackground, // Set your desired background color
@@ -21,66 +23,103 @@ const TabsLayout = () => {
         }}
     >
         <Tabs.Screen 
-            name="home" // Name of the file referencing
+            name="(home)" // Name of the file referencing
             options={{ 
                 tabBarLabel: "Home", // What shows up for the tab label underneath the icon
-                tabBarIcon: ({ color }) => // destructure color passing in the arrow function so we can pass it into the icon
+                tabBarIcon: ({ color }) => (// destructure color passing in the arrow function so we can pass it into the icon
                 // Tab icon imported above
-                <Ionicons 
-                    name="home-outline" // Icon name for the Home tab as defined in expo/vector-icons, can be found on website
-                    size={30} // Size of icon
-                    color={color} // Color of icon passed dynamically from the screenOptions
-                />
+                    <Ionicons 
+                        name="home-outline" // Icon name for the Home tab as defined in expo/vector-icons, can be found on website
+                        size={30} // Size of icon
+                        color={color} // Color of icon passed dynamically from the screenOptions
+                    />
+                ),
+                header: () => (
+                    <CustomHeader 
+                      title="Home"
+                      imageSource={Images.logoNoText} // Replace with actual image source
+                    />
+                  ),
             }}
         />
+
         <Tabs.Screen 
-            name="pantries" 
+            name="(pantries)" 
             options={{ 
                 tabBarLabel: "Pantries",
                 // destructure color passing in the arrow function so we can pass it into the icon
-                tabBarIcon: ({ color }) =>
+                tabBarIcon: ({ color }) => (
                 <Ionicons 
                     name="basket-outline" 
                     size={30} 
                     color={color} />
+                ),
+                header: () => (
+                    <CustomHeader 
+                      title="Pantries"
+                      imageSource={Images.logoNoText} // Replace with actual image source
+                    />
+                ),
             }}
         />
         <Tabs.Screen 
-            name="scanner" 
+            name="(scanner)" 
             options={{ 
                 tabBarLabel: "Scanner",
                 // destructure color passing in the arrow function so we can pass it into the icon
-                tabBarIcon: ({ color }) =>
+                tabBarIcon: ({ color }) => (
                 <MaterialCommunityIcons 
                     name="line-scan" 
                     size={30} 
                     color={color}
                 />
+                ),
+                header: () => (
+                    <CustomHeader 
+                    title="Scanner"
+                    imageSource={Images.logoNoText} // Replace with actual image source
+                    />
+                ),
             }}
         />
         <Tabs.Screen 
-            name="recipes" 
+            name="(recipes)" 
             options={{ 
                 tabBarLabel: "Recipes",
                 // destructure color passing in the arrow function so we can pass it into the icon
-                tabBarIcon: ({ color }) =>
+                tabBarIcon: ({ color }) => (
                 <Entypo 
                     name="open-book" 
                     size={30} 
                     color={color}
                 />
+                ),
+                header: () => (
+                    <CustomHeader 
+                    title="Recipes"
+                    imageSource={Images.logoNoText} // Replace with actual image source
+                    />
+                ),
             }}
         />
         <Tabs.Screen 
-            name="profile" 
+            name="(profile)" 
             options={{ 
                 tabBarLabel: "Profile",
                 // destructure color passing in the arrow function so we can pass it into the icon
-                tabBarIcon: ({ color }) =>
+                tabBarIcon: ({ color }) => (
                 <Ionicons 
                     name="person-outline" 
                     size={30} 
-                    color={color} />
+                    color={color} 
+                /> 
+                ),
+                header: () => (
+                    <CustomHeader 
+                    title="Profile"
+                    imageSource={Images.logoNoText} // Replace with actual image source
+                    />
+                ),
             }}
         />
     </Tabs>
