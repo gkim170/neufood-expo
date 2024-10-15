@@ -3,7 +3,7 @@ import { TouchableOpacity, Text } from 'react-native'
 import React from 'react'
 
 // Want to define an interface for props
-interface CustomButtonProps {
+interface SignInButtonProps {
     onPress: () => void;
 
     title: string
@@ -13,24 +13,25 @@ interface CustomButtonProps {
 }
 
 // destructor from the props
-const CustomButton = ({ 
+const SignInButton = ({ 
     onPress, 
     title, 
     textStyles = "", 
     containerStyles ="",
-}: CustomButtonProps) => {
+}: SignInButtonProps) => {
   return (
     <TouchableOpacity 
         activeOpacity={0.6}
         // use backtick so we can use interpolation
-        className={`flex flex-row items-center justify-center bg-custom-background border-2 border-custom-green rounded-full mt-4 py-5 w-1/2 ${containerStyles}`}
+        className={`flex flex-row items-center justify-center bg-secondary-green rounded-full py-5 w-3/4 ${containerStyles}`}
+        // className="flex flex-row items-center justify-center bg-custom-background border-custom-green border-2 rounded-full py-3 mt-4 w-full"
         onPress={onPress}
     >
-        <Text className={`font-semibold text-lg ${textStyles}`}>
+        <Text className={`font-semibold text-white text-lg ${textStyles}`}>
             {title}
         </Text>
     </TouchableOpacity>
   );
 };
 
-export default CustomButton;
+export default SignInButton;
