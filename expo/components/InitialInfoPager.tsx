@@ -93,7 +93,7 @@ const InitialInfoPager: React.FC = () => {
         {/* Page 5 */}
         <InfoPageStyle title="Ready to get started?" key="5">
           <CustomButton 
-            onPress={() => router.push("/home")} 
+            onPress={() => router.push("/(home)")} 
             title={'Get Started'}
           />
         </InfoPageStyle>
