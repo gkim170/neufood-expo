@@ -1,6 +1,6 @@
-// home/_layout.tsx
+// Layout for pantries tab
 import React from 'react';
-import { Stack } from 'expo-router'; // You could also use Tabs if required
+import { Stack } from 'expo-router'; 
 
 const PantriesLayout = () => {
   return (

@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 const HomePage = () => {
   // Used to make sure we get here correctly (for testing), can see this log in the terminal
   useEffect(() => {
-    console.log('HomeScreen rendered');
+    console.log('Home page rendered');
   }, []);
 
   return (
