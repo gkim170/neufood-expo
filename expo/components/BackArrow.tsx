@@ -12,7 +12,7 @@ const BackArrow = () => {
       className="absolute left-4 top-5 p-2 z-10"
       onPress={() => navigation.goBack()}
     >
-        <Ionicons name="chevron-back" size={24} color="black" />
+        <Ionicons name="chevron-back" size={30} color="black" />
     </TouchableOpacity>
   );
 };

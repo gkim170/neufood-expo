@@ -8,15 +8,15 @@ interface CustomHeaderProps {
 
 const CustomHeader = ({ title, imageSource }: CustomHeaderProps) => {
   return (
-    <View className="bg-primary-green flex-row items-center h-20">
-        <View className="mt-4">
+    <View className="bg-primary-green flex-row items-center h-25">
+        <View className="mt-8">
             <Image 
             source={imageSource} 
             className="w-20 h-20" 
             resizeMode="contain"
             />
         </View>
-        <View className="flex-1 items-center justify-center mt-3">
+        <View className="flex-1 items-center justify-center mt-8">
             <Text className="text-2xl font-bold text-center"> 
               {title}
             </Text>
