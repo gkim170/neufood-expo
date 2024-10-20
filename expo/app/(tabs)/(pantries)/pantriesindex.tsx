@@ -1,46 +1,26 @@
-import { View, Text } from 'react-native';
-import React, { useState } from 'react';
-import CustomButton from '@/components/CustomButton';
-import AddPantry from '@/components/pantries-components/AddPantry';
-import EditPantry from '@/components/pantries-components/EditPantry';
+import { View, Text } from 'react-native'
+import React, { useEffect } from 'react'
+import DarkButton from '../../../components/DarkButton';
+import { router } from 'expo-router';
 
 const Pantries = () => {
-  const [view, setView] = useState('main'); // State to control which view to show
-
-  const goBack = () => setView('main'); // Reset to main view
-
-  // Define a mapping of views to components
-  const renderView = () => {
-    switch (view) {
-      case 'addPantry':
-        return <AddPantry goBack={goBack} />;
-      case 'editPantry':
-        return <EditPantry goBack={goBack} />;
-      default:
-        return (
-          <View style={{ width: '100%', padding: 16 }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 24, marginBottom: 16 }}>Pantries</Text>
-            <CustomButton 
-              onPress={() => setView('addPantry')}  // Switch to Add Pantry form
-              title="Add Pantry"
-            />
-            <CustomButton 
-              onPress={() => setView('editPantry')}  // Switch to Edit Pantry form
-              title="Edit Pantry"
-            />
-            {/* List of existing pantries (placeholder) */}
-            <View style={{ marginTop: 16 }}>
-              <Text>Existing Pantry 1</Text>
-              <Text>Existing Pantry 2</Text>
-            </View>
-          </View>
-        );
-    }
-  };
-
+    // Used to make sure we get here correctly (for testing), can see this log in the terminal
+    useEffect(() => {
+      console.log('Pantries page rendered');
+    }, []);
+  
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' }}>
-      {renderView()}
+    <View className="flex-1 justify-center items-center bg-custom-background">
+      <DarkButton 
+        onPress={() => router.push("./addpantry")} 
+        title={'Add Pantry'}
+
+      />
+      <Text></Text>
+      <DarkButton 
+        onPress={() => router.push("./individualpantry")} 
+        title={'Individual pantry page'}
+      />
     </View>
   );
 };

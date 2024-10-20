@@ -2,7 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StatusBar } from 'react-native
 import React, { useState } from 'react';
 import BackArrow from '@/components/BackArrow';
 import { Link } from 'expo-router';
-import SignInButton from '@/components/SignInButton'; // Assuming similar button component exists
+import SignInButton from '@/components/DarkButton'; // Assuming similar button component exists
 import GoogleButton from '@/components/GoogleButton';
 
 const SignUp = () => {
