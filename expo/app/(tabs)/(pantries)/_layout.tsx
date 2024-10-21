@@ -6,11 +6,23 @@ const PantriesLayout = () => {
   return (
     <Stack>
         <Stack.Screen 
-        name="index" 
+        name="pantriesindex" 
         options={{ headerShown: false }}
         />
         <Stack.Screen 
-        name="next" 
+        name="addpantry" 
+        options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+        name="addcontributors" 
+        options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+        name="success" 
+        options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+        name="individualpantry" 
         options={{ headerShown: false }}
         />
     </Stack>

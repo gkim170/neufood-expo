@@ -2,7 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StatusBar } from 'react-native
 import React, { useState } from 'react';
 import BackArrow from '@/components/BackArrow';
 import { FontAwesome } from '@expo/vector-icons'; // for Google icon
-import SignInButton from '@/components/SignInButton';
+import SignInButton from '@/components/DarkButton';
 import GoogleButton from '@/components/GoogleButton';
 import { Link } from 'expo-router';
 
