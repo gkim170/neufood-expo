@@ -13,6 +13,7 @@ const Success = () => {
   return (
     <View className="flex-1 justify-center items-center bg-custom-background">
       <BackArrow/>
+      {/** should add a checkmark or something here for success (see figma) */}
       <Text className="font-bold text-2xl my-4">
         Success!
       </Text>

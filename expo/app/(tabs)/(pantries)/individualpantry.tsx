@@ -1,34 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput } from 'react-native';
-import CustomButton from '@/components/CustomButton';
+import DarkButton from '@/components/DarkButton';
+import BackArrow from '@/components/BackArrow';
+import { router } from 'expo-router';
 
-const EditPantry = ({ goBack }) => {  // Accept goBack function as a prop
-  const [pantryName, setPantryName] = useState('');  // Pantry name input state
+const Success = () => {
+  // Used to make sure we get here correctly (for testing), can see this log in the terminal
+  useEffect(() => {
+    console.log('Individual pantry page rendered');
+  }, []);
 
   return (
-    // Add Pantry form
-    <View style={{ width: '100%', padding: 16 }}>
-      <Text style={{ fontWeight: 'bold', fontSize: 24, marginBottom: 16 }}>Edit Your Pantry</Text>
-      <TextInput
-        style={{ borderColor: '#ccc', borderWidth: 1, padding: 10, width: '80%', marginBottom: 20 }}
-        placeholder="Enter Pantry Name"
-        value={pantryName}
-        onChangeText={setPantryName}
-      />
-      <CustomButton 
-        onPress={() => {
-            //hit the route to create a new pantry here
-          console.log('Pantry Edited:', pantryName);
-          goBack();  // Call the goBack function to return to Pantries list
-        }}
-        title="Edit Pantry"
-      />
-      <CustomButton 
-        onPress={goBack}  // Call goBack to return to Pantries list
-        title="Cancel"
+    <View className="flex-1 justify-center items-center bg-custom-background">
+      <BackArrow/>
+      <Text className="font-bold text-2xl my-4">
+        INDIVIDUAL PANTRY!
+      </Text>
+
+      {/* Need button format to be this */}
+      <DarkButton 
+        onPress={() => router.push("./pantriesindex")} 
+        title={'Back to Pantries'}
       />
     </View>
   );
 };
 
-export default EditPantry;
+export default Success;

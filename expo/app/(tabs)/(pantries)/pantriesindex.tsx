@@ -1,6 +1,7 @@
-import { View, Text } from 'react-native'
-import React, { useEffect } from 'react'
-import DarkButton from '../../../components/DarkButton';
+import { View, Text, Image, Pressable } from 'react-native';
+import React, { useEffect } from 'react';
+import DarkButton from '@/components/DarkButton';
+import PantryButton from '@/components/PantryButton';
 import { router } from 'expo-router';
 
 const Pantries = () => {
@@ -8,18 +9,20 @@ const Pantries = () => {
     useEffect(() => {
       console.log('Pantries page rendered');
     }, []);
+    const defaultPantry = require('@/assets/images/pantries/pantry-default-img.png');
   
   return (
     <View className="flex-1 justify-center items-center bg-custom-background">
       <DarkButton 
         onPress={() => router.push("./addpantry")} 
         title={'Add Pantry'}
-
       />
       <Text></Text>
-      <DarkButton 
+      {/** TODO: MAKE THIS DYNAMICALLY POPULATE FOR A LIST OF JSON TITLES (and images if we want) */}
+      <PantryButton 
+        title="Pantry" 
         onPress={() => router.push("./individualpantry")} 
-        title={'Individual pantry page'}
+        imageSource={defaultPantry} 
       />
     </View>
   );
