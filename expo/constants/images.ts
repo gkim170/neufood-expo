@@ -8,6 +8,7 @@ import downArrow from "@/assets/images/about/down-arrow.png";
 import network from "@/assets/images/about/network.png";
 import recipe from "@/assets/images/about/recipe.png";
 import time from "@/assets/images/about/time.png";
+import profpic from "@/assets/images/profile/profilepic.png"
 
 export default {
     logo,
@@ -17,5 +18,6 @@ export default {
     downArrow,
     network,
     recipe,
-    time
+    time,
+    profpic
 };
