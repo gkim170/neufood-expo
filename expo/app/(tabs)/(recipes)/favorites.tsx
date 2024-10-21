@@ -3,24 +3,22 @@ import React, { useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import CustomButton from '../../../components/CustomButton';
 import { router } from 'expo-router';
+import BackArrow from '@/components/BackArrow';
 
-const RecipesPage = () => {
+const Favorites = () => {
   // Used to make sure we get here correctly (for testing), can see this log in the terminal
   useEffect(() => {
-    console.log('Recipes page rendered');
+    console.log('Favorites page rendered');
   }, []);
 
   return (
     <View className="flex-1 justify-center items-center bg-custom-background">
+      <BackArrow/>
       <Text className="font-bold text-2xl my-4">
-        recipes
+        My favorites
       </Text>
-      <CustomButton 
-        onPress={() => router.push("./next")} 
-        title={'Next page'}
-      />
     </View>
   );
 };
 
-export default RecipesPage;
+export default Favorites;

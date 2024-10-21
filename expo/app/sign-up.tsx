@@ -28,7 +28,7 @@ const SignUp = () => {
       <BackArrow />
 
       {/* Name Input Fields */}
-      <View className="flex flex-row justify-between w-full mb-4">
+      <View className="flex flex-row justify-between w-full mb-4 mt-5">
         {/* First Name Input */}
         <TextInput
           className="border border-black rounded-2xl p-7 pl-4 pt-2 w-[48%] mr-2"
