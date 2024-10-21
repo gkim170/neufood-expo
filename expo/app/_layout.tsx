@@ -10,7 +10,11 @@ export default function RootLayout() {
     return (
         // SafeAreaProvider ensures content is shown within safe areas on a device
         <SafeAreaProvider>
-            <Stack>
+            <Stack 
+                screenOptions={{ 
+                headerShown: false, 
+                animation: 'none', 
+            }}>
                 {/* Tabs will be shown on top of index.tsx */}
                 <Stack.Screen
                     name="sign-in"
@@ -34,14 +38,8 @@ export default function RootLayout() {
                         ),
                     }}
                 />
-                <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }} // Hides the header for the tab layout screen
-                />
-                <Stack.Screen
-                    name="index"
-                    options={{ headerShown: false }}
-                />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="index" />
             </Stack>
         </SafeAreaProvider>
     );

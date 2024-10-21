@@ -18,6 +18,7 @@ module.exports = {
             'custom-green': '#859860',
             'primary-green': '#C4D2A6',
             'secondary-green': '#394032',
+            'primary-pink': '#F2D3C0',
           },
       },
   },
