@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React, { useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import SignInButton  from '../../../components/SignInButton';
+import DarkButton  from '../../../components/DarkButton';
 import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
 
@@ -17,7 +17,7 @@ const Selection = () => {
       <Text className="font-bold text-2xl my-4">
         Make Selections for Recipes
       </Text>
-      <SignInButton 
+      <DarkButton 
         onPress={() => router.push("./generated")} 
         title={'Show Me Recipes'}
       />
