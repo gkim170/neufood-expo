@@ -1,9 +1,15 @@
-import { View, Text, TextInput, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import React, { useState } from 'react';
 import BackArrow from '@/components/BackArrow';
 import { Link } from 'expo-router';
 import SignInButton from '@/components/DarkButton'; // Assuming similar button component exists
 import GoogleButton from '@/components/GoogleButton';
+import axios, { AxiosError } from 'axios';
+
+// Define the expected structure of your error response
+interface ErrorResponse {
+  message: string;
+}
 
 const SignUp = () => {
   const [firstName, setFirstName] = useState('');
@@ -11,9 +17,35 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignUp = () => {
-    // Handle sign-up logic here (e.g., API call to register user)
-    console.log('Sign up with:', firstName, lastName, email, password);
+  const handleSignUp = async () => {
+    const name = `${firstName} ${lastName}`;
+  
+    try {
+      // Make a POST request to the backend server
+      const response = await axios.post(`http://localhost:port/auth/register`, {
+        name,
+        email,
+        password,
+      });
+  
+      // Log the response from the server
+      console.log('Sign-up successful:', response.data);
+      Alert.alert('Success', 'User registered successfully!'); // Optional: to give feedback to the user
+  
+    } catch (error) {
+      const axiosError = error as AxiosError;
+  
+      if (axiosError.response) {
+        // Assert that response.data matches the ErrorResponse structure
+        const errorData = axiosError.response.data as ErrorResponse;
+        
+        console.error('Error during sign-up:', errorData.message);
+        Alert.alert('Error', errorData.message || 'Server error. Please try again.');
+      } else {
+        console.error('Error during sign-up:', axiosError.message);
+        Alert.alert('Error', 'An unknown error occurred. Please try again.');
+      }
+    }
   };
 
   const handleGoogleSignIn = () => {
