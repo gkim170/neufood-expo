@@ -1,18 +1,50 @@
-import { View, Text, TextInput, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import React, { useState } from 'react';
 import BackArrow from '@/components/BackArrow';
 import { FontAwesome } from '@expo/vector-icons'; // for Google icon
 import SignInButton from '@/components/DarkButton';
 import GoogleButton from '@/components/GoogleButton';
 import { Link } from 'expo-router';
+import axios, { AxiosError } from 'axios';
+const url = process.env.EXPO_PUBLIC_API_URL;
+
+// Define the expected structure of your error response
+interface ErrorResponse {
+  message: string;
+}
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
+    
     // Handle sign-in logic here 
-    console.log('Sign in with:', email, password);
+    try {
+      // Make a POST request to the backend server
+      const response = await axios.post(`${url}/auth/login`, {
+        email,
+        password,
+      });
+  
+      // Log the response from the server
+      console.log('Sign-in successful:', response.data);
+      Alert.alert('Success', 'User logged in successfully!'); // Optional: to give feedback to the user
+  
+    } catch (error) {
+      const axiosError = error as AxiosError;
+  
+      if (axiosError.response) {
+        // Assert that response.data matches the ErrorResponse structure
+        const errorData = axiosError.response.data as ErrorResponse;
+        
+        console.error('Error during sign-in:', errorData.message);
+        Alert.alert('Error', errorData.message || 'Server error. Please try again.');
+      } else {
+        console.error('Error during sign-in:', axiosError.message);
+        Alert.alert('Error', 'An unknown error occurred. Please try again.');
+      }
+    }
   };
 
   const handleGoogleSignIn = () => {
