@@ -141,7 +141,6 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     color: '#0a0a0a',
-    fontFamily: 'Trebuchet MS',  
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -166,7 +165,6 @@ const styles = StyleSheet.create({
   username: {
     flex: 1,
     color: '#0a0a0a',
-    fontFamily: 'Trebuchet MS',
     fontSize: 20,
     fontWeight: 'bold',
     justifyContent: 'center',
@@ -175,7 +173,6 @@ const styles = StyleSheet.create({
   useremail: {
     flex: 1,
     color: '#0a0a0a',
-    fontFamily: 'Trebuchet MS',
     fontSize: 16,
     justifyContent: 'center',
     alignItems: 'center',
