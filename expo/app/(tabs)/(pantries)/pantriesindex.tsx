@@ -5,6 +5,7 @@ import PantryButton from '@/components/PantryButton';
 import { router } from 'expo-router';
 
 const Pantries = () => {
+    // TODO: FIX FONTS EVERYWHERE IN PANTRIES!
     // Used to make sure we get here correctly (for testing), can see this log in the terminal
     useEffect(() => {
       console.log('Pantries page rendered');
