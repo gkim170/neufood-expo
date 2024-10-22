@@ -1,10 +1,15 @@
-import { View, Text, Image, TextInput, StyleSheet } from 'react-native'
+import { View, Text, Image, TextInput, StyleSheet, Button, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import CustomButton from '../../../components/CustomButton';
 import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
 import Images from '@/constants/images'; 
+import ImageViewer from '@/components/ImageViewer';
+
+
+// install the package beforehead
+import * as ImagePicker from 'expo-image-picker';
 
 
 const editProfile = () => {
@@ -18,6 +23,9 @@ const editProfile = () => {
   const [lastname, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [passwd, setPasswd] = useState('');
+
+  // state to store profile picture
+  const [selectedImage, setSelectedImage] = useState('');
 
   // state to track validation errors
   const [error, setError] = useState('');
@@ -41,65 +49,93 @@ const editProfile = () => {
 
   };
 
+
+  const pickImageAsync = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          quality: 1,
+        });
+    
+        if (!result.canceled) {
+          setSelectedImage(result.assets[0].uri);
+          console.log(result);
+        } else {
+          alert('You did not select any image.');
+        }
+      };
+
   return (
-    <View className="flex-1 justify-center items-center bg-custom-background">
+    <View className="flex-1 justify-center items-center bg-custom-background" style={styles.container}>
       <BackArrow/>
-      {/* <Image source={Images.profpic}/> */}
-      
-      {/* input for first name */}
-      <TextInput
-        style={[styles.input, error && !firstname ? styles.errorInput : null]}
-        placeholder="First *"
-        placeholderTextColor="#888"
-        value={firstname}
-        onChangeText={setFirstName}
-      />
 
-      {/* input for last name */}
-      <TextInput
-        style={[styles.input, error && !lastname ? styles.errorInput : null]}
-        placeholder="Last"
-        placeholderTextColor="#888"
-        value={lastname}
-        onChangeText={setLastName}
-      />
+      {/* profile picture to be uploaded */}
+      <View style={styles.imageselect}>
+       {/* image holder */}
+       <View style={styles.imageContainer}>
+        <TouchableOpacity onPress={pickImageAsync}>
+            <ImageViewer
+              placeholderImageSource={Images.profpic}
+              selectedImage={selectedImage}
+            />
+        </TouchableOpacity>
+       </View>
+       {/* buttons to select and use photo */}
+     </View>
+      <View style={styles.form}>
+        {/* input for first name */}
+        <TextInput
+          style={[styles.input, error && !firstname ? styles.errorInput : null]}
+          placeholder="First *"
+          placeholderTextColor="#888"
+          value={firstname}
+          onChangeText={setFirstName}
+        />
 
-      {/* input for email */}
-      <TextInput
-        style={[styles.input, error && !email ? styles.errorInput : null]}
-        placeholder="Email *"
-        placeholderTextColor="#888"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
+        {/* input for last name */}
+        <TextInput
+          style={[styles.input, error && !lastname ? styles.errorInput : null]}
+          placeholder="Last"
+          placeholderTextColor="#888"
+          value={lastname}
+          onChangeText={setLastName}
+        />
 
-      {/* input for password */}
-      <TextInput
-        style={[styles.input, error && !lastname ? styles.errorInput : null]}
-        placeholder="Password *"
-        placeholderTextColor="#888"
-        value={passwd}
-        onChangeText={setPasswd}
-      />
+        {/* input for email */}
+        <TextInput
+          style={[styles.input, error && !email ? styles.errorInput : null]}
+          placeholder="Email *"
+          placeholderTextColor="#888"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
 
+        {/* input for password */}
+        <TextInput
+          style={[styles.input, error && !lastname ? styles.errorInput : null]}
+          placeholder="Password *"
+          placeholderTextColor="#888"
+          value={passwd}
+          onChangeText={setPasswd}
+        />
 
+        {/* <Text style={styles.label}>
+          First <Text style={styles.required}>*</Text>
+        </Text>
+        <TextInput
+          style={[styles.input, error && !firstname ? styles.errorInput : null]}
+          placeholder="Enter your name"
+          value={firstname}
+          onChangeText={setFirstName}
+        /> */}
 
-      {/* <Text style={styles.label}>
-        First <Text style={styles.required}>*</Text>
-      </Text>
-      <TextInput
-        style={[styles.input, error && !firstname ? styles.errorInput : null]}
-        placeholder="Enter your name"
-        value={firstname}
-        onChangeText={setFirstName}
-      /> */}
+        {/* Error Message */}
+        {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      {/* Error Message */}
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+        {/* Submit Button */}
+        <CustomButton title="Save Changes" onPress={handleSubmit} />
 
-      {/* Submit Button */}
-      <CustomButton title="Save Changes" onPress={handleSubmit} />
+      </View>
 
     </View>
   );
@@ -111,9 +147,32 @@ export default editProfile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  imageselect: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 16,
+  },
+  form: {
+    flex: 5,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 50,
+  },
+  imageContainer: {
+    flex: 1,
+    paddingTop: 48,
+  },
+  footerContainer: {
+    flex: 1 / 3,
+    alignItems: 'center',
+    marginLeft: 50,
   },
   heading: {
     fontSize: 24,
