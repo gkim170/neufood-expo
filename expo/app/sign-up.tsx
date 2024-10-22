@@ -5,6 +5,7 @@ import { Link } from 'expo-router';
 import SignInButton from '@/components/DarkButton'; // Assuming similar button component exists
 import GoogleButton from '@/components/GoogleButton';
 import axios, { AxiosError } from 'axios';
+const url = process.env.EXPO_PUBLIC_API_URL;
 
 // Define the expected structure of your error response
 interface ErrorResponse {
@@ -22,7 +23,7 @@ const SignUp = () => {
   
     try {
       // Make a POST request to the backend server
-      const response = await axios.post(`http://localhost:port/auth/register`, {
+      const response = await axios.post(`${url}/auth/register`, {
         name,
         email,
         password,
