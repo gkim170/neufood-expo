@@ -1,8 +1,9 @@
-import { View, Text, Image, Pressable } from 'react-native';
+import { View, Text, Image, Pressable, ScrollView } from 'react-native';
 import React, { useEffect } from 'react';
+import { router } from 'expo-router';
 import DarkButton from '@/components/DarkButton';
 import PantryButton from '@/components/PantryButton';
-import { router } from 'expo-router';
+import Images from '@/constants/images';
 
 const Pantries = () => {
     // TODO: FIX FONTS EVERYWHERE IN PANTRIES!
@@ -10,21 +11,26 @@ const Pantries = () => {
     useEffect(() => {
       console.log('Pantries page rendered');
     }, []);
-    const defaultPantry = require('@/assets/images/pantries/pantry-default-img.png');
   
   return (
+  
     <View className="flex-1 justify-center items-center bg-custom-background">
+      <Text></Text>
       <DarkButton 
         onPress={() => router.push("./addpantry")} 
         title={'Add Pantry'}
       />
       <Text></Text>
       {/** TODO: MAKE THIS DYNAMICALLY POPULATE FOR A LIST OF JSON TITLES (and images if we want) */}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="bg-custom-background">
       <PantryButton 
         title="Pantry" 
         onPress={() => router.push("./individualpantry")} 
-        imageSource={defaultPantry} 
+        imageSource={Images.defaultPantry} 
+        
+        //push certain stuff
       />
+      </ScrollView>
     </View>
   );
 };
