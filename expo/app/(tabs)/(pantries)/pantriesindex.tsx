@@ -14,8 +14,7 @@ const Pantries = () => {
   
   return (
   
-    <View className="flex-1 justify-center items-center bg-custom-background">
-      <Text></Text>
+    <View className="flex-1 justify-center items-center bg-custom-background mt-10 mb-10">
       <DarkButton 
         onPress={() => router.push("./addpantry")} 
         title={'Add Pantry'}

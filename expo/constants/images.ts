@@ -9,6 +9,19 @@ import network from "@/assets/images/about/network.png";
 import recipe from "@/assets/images/about/recipe.png";
 import time from "@/assets/images/about/time.png";
 import defaultPantry from "@/assets/images/pantries/pantry-default-img.png";
+import condiments from "@/assets/images/pantries/ingredients/condiments.png";
+import dairy from "@/assets/images/pantries/ingredients/dairy.png";
+import desserts from "@/assets/images/pantries/ingredients/desserts.png";
+import drinks from "@/assets/images/pantries/ingredients/drinks.png";
+import fruits from "@/assets/images/pantries/ingredients/fruits.png";
+import grains from "@/assets/images/pantries/ingredients/grains.png";
+import oils from "@/assets/images/pantries/ingredients/oils.png";
+import other from "@/assets/images/pantries/ingredients/other.png";
+import protein from "@/assets/images/pantries/ingredients/protein.png";
+import snacks from "@/assets/images/pantries/ingredients/snacks.png";
+import spices from "@/assets/images/pantries/ingredients/spices.png";
+import spreads from "@/assets/images/pantries/ingredients/spreads.png";
+import vegetables from "@/assets/images/pantries/ingredients/vegetables.png";
 
 export default {
     logo,
@@ -19,5 +32,18 @@ export default {
     network,
     recipe,
     time,
-    defaultPantry
+    defaultPantry,
+    condiments,
+    dairy,
+    desserts,
+    drinks,
+    fruits,
+    grains,
+    oils,
+    other,
+    protein,
+    snacks,
+    spices,
+    spreads,
+    vegetables
 };
