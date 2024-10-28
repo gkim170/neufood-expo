@@ -18,16 +18,49 @@ const Success = () => {
     // Logic to add an ingredient, e.g., opening a modal or form
   };
 
+  //random ingredients thing etc.
+  let ingredients2 = [
+    {
+      name: "Tomato",
+      quantity: 5,
+      image: Images.other,
+      category: "Vegetable",
+      expirationDate: "2024-11-15",
+    },
+    {
+      name: "Milk",
+      quantity: 1,
+      image: Images.other,
+      category: "Dairy",
+      expirationDate: "2024-10-30",
+    },
+    {
+      name: "Eggs",
+      quantity: 12,
+      image: Images.other,
+      category: "Protein",
+      expirationDate: "2024-11-01",
+    },
+    {
+      name: "Bread",
+      quantity: 2,
+      image: Images.other,
+      category: "Grain",
+      expirationDate: "2024-10-29",
+    },
+  ];
+
   return (
     <View className="flex-1 bg-custom-background p-4">
       <BackArrow />
       
       <Text className="font-bold text-2xl my-4 text-center">INDIVIDUAL PANTRY!</Text>
 
+
       {/* Add Ingredient Button */}
       <DarkButton onPress={handleAddIngredient} title="Add Ingredient" />
 
-      {ingredients.length === 0 ? (
+      {ingredients2.length === 0 ? (//
         // No ingredients view
         <View className="items-center mt-6">
           <Text className="text-lg">No Ingredients</Text>
@@ -45,7 +78,7 @@ const Success = () => {
 
           {/* Ingredient Grid */}
           <ScrollView horizontal>
-            {ingredients.map((ingredient, index) => (
+            {ingredients2.map((ingredient, index) => (
               <TouchableOpacity
                 key={index}
                 className="bg-white p-4 m-2 rounded-md shadow"
