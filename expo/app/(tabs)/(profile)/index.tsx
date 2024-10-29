@@ -1,12 +1,24 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { StatusBar } from 'expo-status-bar';
-import CustomButton from '../../../components/CustomButton';
+import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 import Images from '@/constants/images'; 
 
 const ProfilePage = () => {
+
+  const navigation = useNavigation();
+
+  // set the default value of profile data
+  const [user, setUser] = useState({
+    firstname: 'User',
+    lastname: '',
+    email: 'neufood@example.com',
+    passwd: '',
+    selectedImage: Images.profpic,
+  });
+
   // Used to make sure we get here correctly (for testing), can see this log in the terminal
   useEffect(() => {
     console.log('Profile page rendered');
@@ -15,7 +27,18 @@ const ProfilePage = () => {
   // function to navigate to edit profile
   const handleEdit = () => {
     console.log('Navigating to edit profile...'); 
-    router.push("./editprofile");
+    
+    // Navigate to edit profile
+    navigation.navigate('editprofile', { 
+      user,
+      updateUser: (updatedUser) => setUser(updatedUser),
+     });
+
+
+    // Check if result is available to update profileData
+    // if (result) {
+    //   setProfileData(result);
+    // }
   }
 
   // function to navigate to notifications
@@ -63,9 +86,9 @@ const ProfilePage = () => {
       <View style={styles.body}>
           <View style={styles.userinfo}>
             {/* profile picture, username and email */}
-            <Image source={Images.profpic} style={styles.profilepic}/>
-            <Text style={styles.username}>User</Text>
-            <Text style={styles.useremail}>neufood@example.com</Text>
+            <Image source={user.selectedImage == Images.profpic ? user.selectedImage : { uri: user.selectedImage } } style={styles.profilepic}/>
+            <Text style={styles.username}>{user.firstname + " " + user.lastname}</Text>
+            <Text style={styles.useremail}>{user.email}</Text>
           </View>
           {/* menu of functions to navigate */}
           <View style={styles.menu}>

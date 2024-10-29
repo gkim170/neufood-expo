@@ -1,8 +1,9 @@
-import { View, Text, Image, TextInput, StyleSheet, Button, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import CustomButton from '../../../components/CustomButton';
 import { router } from 'expo-router';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import BackArrow from '@/components/BackArrow';
 import Images from '@/constants/images'; 
 import ImageViewer from '@/components/ImageViewer';
@@ -17,6 +18,10 @@ const editProfile = () => {
   useEffect(() => {
     console.log('Edit profile page rendered');
   }, []);
+
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { user } = route.params;
 
   // state to store form data
   const [firstname, setFirstName] = useState('');
@@ -44,9 +49,12 @@ const editProfile = () => {
     }
 
     setError(''); // Clear error if validation passes
-    console.log('Form Submitted.', `Name: ${firstname + ' ' + lastname}, Email: ${email}`);
+    console.log('Form Submitted.', `Name: ${firstname + ' ' + lastname}, Email: ${email}`, ` image: ${selectedImage}`);
     // more actions
 
+    const data = {firstname, lastname, email, passwd, selectedImage};
+    route.params.updateUser(data);
+    navigation.goBack();
   };
 
 
@@ -74,7 +82,7 @@ const editProfile = () => {
        <View style={styles.imageContainer}>
         <TouchableOpacity onPress={pickImageAsync}>
             <ImageViewer
-              placeholderImageSource={Images.profpic}
+              placeholderImageSource={user.selectedImage}
               selectedImage={selectedImage}
             />
         </TouchableOpacity>
