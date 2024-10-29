@@ -1,11 +1,18 @@
-import { View, Text, TextInput, TouchableOpacity, StatusBar, Alert } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, TextInput, Alert, StatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import BackArrow from '@/components/BackArrow';
 import { Link } from 'expo-router';
-import SignInButton from '@/components/DarkButton'; // Assuming similar button component exists
+import SignInButton from '@/components/DarkButton';
 import GoogleButton from '@/components/GoogleButton';
 import axios, { AxiosError } from 'axios';
+import * as Google from 'expo-auth-session/providers/google';
+import { ResponseType } from 'expo-auth-session';
+
 const url = process.env.EXPO_PUBLIC_API_URL;
+const clientIdId = process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID;
+const iosIdId = process.env.EXPO_PUBLIC_GOOGLE_IOS_ID;
+const androidIdId = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_ID;
+const webIdId = process.env.EXPO_PUBLIC_GOOGLE_WEB_ID;
 
 // Define the expected structure of your error response
 interface ErrorResponse {
@@ -18,28 +25,37 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Set up Google OAuth request
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: `${clientIdId}.apps.googleusercontent.com`, // Expo client ID
+    iosClientId: `${iosIdId}.apps.googleusercontent.com`,
+    androidClientId: `${androidIdId}.apps.googleusercontent.com`,
+    webClientId: `${webIdId}.apps.googleusercontent.com`,
+    responseType: ResponseType.IdToken,
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      handleGoogleSignUp(id_token);
+    }
+  }, [response]);
+
+  // Traditional Sign-Up Handler
   const handleSignUp = async () => {
     const name = `${firstName} ${lastName}`;
-  
     try {
-      // Make a POST request to the backend server
       const response = await axios.post(`${url}/auth/register`, {
         name,
         email,
         password,
       });
-  
-      // Log the response from the server
       console.log('Sign-up successful:', response.data);
-      Alert.alert('Success', 'User registered successfully!'); // Optional: to give feedback to the user
-  
+      Alert.alert('Success', 'User registered successfully!');
     } catch (error) {
       const axiosError = error as AxiosError;
-  
       if (axiosError.response) {
-        // Assert that response.data matches the ErrorResponse structure
         const errorData = axiosError.response.data as ErrorResponse;
-        
         console.error('Error during sign-up:', errorData.message);
         Alert.alert('Error', errorData.message || 'Server error. Please try again.');
       } else {
@@ -49,20 +65,27 @@ const SignUp = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Handle Google sign-in logic
-    console.log('Sign in with Google');
+  // Google Sign-Up Handler
+  const handleGoogleSignUp = async (idToken: string) => {
+    try {
+      const result = await axios.post(`${url}/auth/google`, {
+        token: idToken,
+      });
+      console.log('Google sign-up successful:', result.data);
+      Alert.alert('Success', 'Google account used for sign-up successfully!');
+    } catch (error) {
+      const err = error as Error;
+      console.error('Error during Google sign-up:', err.message);
+      Alert.alert('Error', 'Failed to sign up with Google.');
+    }
   };
 
   return (
     <View className="flex-1 justify-center items-center bg-custom-background px-10">
-        <StatusBar barStyle="dark-content"/>
-      {/* Back Arrow */}
+      <StatusBar barStyle="dark-content"/>
       <BackArrow />
 
-      {/* Name Input Fields */}
       <View className="flex flex-row justify-between w-full mb-4 mt-5">
-        {/* First Name Input */}
         <TextInput
           className="border border-black rounded-2xl p-7 pl-4 pt-2 w-[48%] mr-2"
           placeholder="First Name"
@@ -70,8 +93,6 @@ const SignUp = () => {
           onChangeText={setFirstName}
           placeholderTextColor="#6D6868"
         />
-
-        {/* Last Name Input */}
         <TextInput
           className="border border-black rounded-2xl p-7 pl-4 pt-2 w-[48%]"
           placeholder="Last Name"
@@ -81,7 +102,6 @@ const SignUp = () => {
         />
       </View>
 
-      {/* Email Input */}
       <TextInput
         className="border border-black rounded-2xl p-7 pl-4 pt-2 mb-4 w-full"
         placeholder="Email"
@@ -92,8 +112,6 @@ const SignUp = () => {
         autoCorrect={false}
         placeholderTextColor="#6D6868"
       />
-
-      {/* Password Input */}
       <TextInput
         className="border border-black rounded-2xl p-7 pl-4 pt-2 mb-4 w-full"
         placeholder="Password"
@@ -103,18 +121,15 @@ const SignUp = () => {
         placeholderTextColor="#6D6868"
       />
 
-      {/* Sign Up Button */}
       <SignInButton
         onPress={handleSignUp}
         title={'Sign Up'}
       />
 
-        {/* Sign In with Google Button */}
-        <GoogleButton
-        onPress={handleGoogleSignIn}
-        />
+      <GoogleButton
+        onPress={() => promptAsync()}
+      />
 
-      {/* Link to Sign In */}
       <View className="flex mt-4">
         <Text className="font-primary text-gray-600">
           Already have an account?{' '}
