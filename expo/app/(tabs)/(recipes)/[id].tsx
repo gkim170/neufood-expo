@@ -43,43 +43,45 @@ const RecipeDetailScreen = () => {
   );
 
   return (
-    // Image, recipe name, and calories
     <View className="flex-1 bg-custom-background">
-      <View>
-        <BackArrow/>
+      <BackArrow/>
+      <ScrollView>
+        {/* Image, recipe name, and calories */}
         <View>
           <View>
-            <Image source={recipe.image} className="h-60 w-full" />
-          </View>
-          <View className="px-5">
-            <Text className="text-2xl font-bold mt-4">{recipe.label}</Text>
-            <Text className="font-primary text-gray-600">Calories: {recipe.calories} kcal</Text>
+            <View>
+              <Image source={recipe.image} className="h-half w-full" />
+            </View>
+            <View className="px-5">
+              <Text className="text-2xl font-bold mt-4">{recipe.label}</Text>
+              <Text className="font-primary text-gray-600">Calories: {recipe.calories} kcal</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Info titles that you can click between: ingredients and instructions */}
-      <View className="flex-row justify-center items-center gap-10 p-5">
-        {/* Initially ingredients are displayed and can switch to instructions by clicking that button */}
-        <TouchableOpacity onPress={() => setShowIngredients(true)}>
-          <Text className={`font-bold ${showIngredients ? 'text-black' : 'text-gray-600'}`}>
-            Ingredients
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setShowIngredients(false)}>
-          <Text className={`font-bold ${!showIngredients ? 'text-black' : 'text-gray-600'}`}>
-            Instructions
-          </Text>
-        </TouchableOpacity>
-      </View>
+        {/* Info titles that you can click between: ingredients and instructions */}
+        <View className="flex-row justify-center items-center gap-10 p-5">
+          {/* Initially ingredients are displayed and can switch to instructions by clicking that button */}
+          <TouchableOpacity onPress={() => setShowIngredients(true)}>
+            <Text className={`font-bold ${showIngredients ? 'text-black' : 'text-gray-600'}`}>
+              Ingredients
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowIngredients(false)}>
+            <Text className={`font-bold ${!showIngredients ? 'text-black' : 'text-gray-600'}`}>
+              Instructions
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Info that will be displayed dependany on the setShowIngredients state */}
-      <ScrollView className="px-5">
-        {showIngredients ? (
-            <IngredientList />
-          ) : (
-            <InstructionList />
-        )}
+        {/* Info that will be displayed dependant on the setShowIngredients state */}
+        <View className="px-5">
+          {showIngredients ? (
+              <IngredientList />
+            ) : (
+              <InstructionList />
+          )}
+        </View>
       </ScrollView>
     </View>
   );
