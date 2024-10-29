@@ -18,6 +18,13 @@ const Success = () => {
     // Logic to add an ingredient, e.g., opening a modal or form
   };
 
+  //random pantries
+  const pantries = [
+    { id: 1, name: 'Pantry A' },
+    { id: 2, name: 'Pantry B' },
+    { id: 3, name: 'Pantry C' },
+    // Add more pantry objects as needed
+  ];
   //random ingredients thing etc.
   let ingredients2 = [
     {
@@ -53,12 +60,16 @@ const Success = () => {
   return (
     <View className="flex-1 bg-custom-background p-4">
       <BackArrow />
+        <ScrollView horizontal>
+        
+        </ScrollView>
       
-      <Text className="font-bold text-2xl my-4 text-center">INDIVIDUAL PANTRY!</Text>
-
 
       {/* Add Ingredient Button */}
-      <DarkButton onPress={handleAddIngredient} title="Add Ingredient" />
+      <DarkButton 
+      style={{marginTop: 10, marginLeft: 50, justifyContent: 'center'}}//not good practice, want to center but it's not working tbh
+      onPress={handleAddIngredient} title="Add Ingredient" />
+
 
       {ingredients2.length === 0 ? (//
         // No ingredients view
@@ -73,15 +84,24 @@ const Success = () => {
           {/* Search bar */}
           <TextInput
             placeholder="Search ingredients..."
-            className="bg-white rounded-md p-2 mb-4"
+            className="text-black bg-white rounded-md p-2 mb-4 border-gray-300"
+            style={{
+              color: 'black', // Set text color
+              backgroundColor: 'white',
+              borderRadius: 8,
+              padding: 8,
+              marginBottom: 16,
+              borderWidth: 1,
+              borderColor: 'gray', // or use the appropriate color
+            }}
           />
 
           {/* Ingredient Grid */}
-          <ScrollView horizontal>
+          <ScrollView>
             {ingredients2.map((ingredient, index) => (
               <TouchableOpacity
                 key={index}
-                className="bg-white p-4 m-2 rounded-md shadow"
+                className="bg-white p-4 m-2 rounded-md shadow "
                 onPress={() => console.log('Ingredient clicked')}
               >
                 <Image source={{ uri: Images.other }} className="w-12 h-12" />
@@ -95,12 +115,6 @@ const Success = () => {
           </ScrollView>
         </View>
       )}
-
-      {/* Back Button to Pantries Index */}
-      <DarkButton
-        onPress={() => router.push('./pantriesindex')}
-        title="Back to Pantries"
-      />
     </View>
   );
 };

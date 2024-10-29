@@ -11,25 +11,42 @@ const Pantries = () => {
     useEffect(() => {
       console.log('Pantries page rendered');
     }, []);
+
+    //test data
+    const pantryData = [
+      {
+        id: 1,
+        title: "Pantry 1",
+        imageSource: Images.defaultPantry,
+      },
+      {
+        id: 2,
+        title: "Pantry 2",
+        imageSource: Images.defaultPantry,
+      },
+      // Add more pantry items as needed
+    ];
   
   return (
   
-    <View className="flex-1 justify-center items-center bg-custom-background mt-10 mb-10">
+    <View className="flex-1 justify-center items-center bg-custom-background">
       <DarkButton 
         onPress={() => router.push("./addpantry")} 
         title={'Add Pantry'}
+        style={{ margin: 15 }}
       />
       <Text></Text>
       {/** TODO: MAKE THIS DYNAMICALLY POPULATE FOR A LIST OF JSON TITLES (and images if we want) */}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="bg-custom-background">
-      <PantryButton 
-        title="Pantry" 
-        onPress={() => router.push("./individualpantry")} 
-        imageSource={Images.defaultPantry} 
-        
-        //push certain stuff
-      />
-      </ScrollView>
+      {pantryData.map((pantry) => (
+        <PantryButton 
+          key={pantry.id}
+          title={pantry.title} 
+          onPress={() => router.push("./individualpantry")} 
+          imageSource={pantry.imageSource} 
+        />
+      ))}
+    </ScrollView>
     </View>
   );
 };
@@ -51,7 +68,7 @@ export default Pantries;
  *    Success page
  *        checkmark
  *        your new pantry has been created
- *        auto go to (new) pantry subtab 
+ *        go to home pantry subtab 
  *  (onClick) individual pantry from main pantry tab --> goto pantry subtab
  *    pantry subtab
  *        horizontal scrolling bar at top, highlighted on which pantry you're looking at

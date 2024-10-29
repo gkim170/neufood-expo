@@ -1,30 +1,27 @@
 // Custom button component that can be reused
-import { TouchableOpacity, Text } from 'react-native'
+import { TouchableOpacity, StyleProp, ViewStyle, Text } from 'react-native'
 import React from 'react'
 
-// Want to define an interface for props
-interface SignInButtonProps {
+interface DarkButtonProps {
     onPress: () => void;
-
-    title: string
-    // the ? means optional
+    title: string;
     textStyles?: string;
     containerStyles?: string;
+    style?: StyleProp<ViewStyle>; // Allows inline styles
 }
 
-// destructor from the props
-const SignInButton = ({ 
+const DarkButton = ({ 
     onPress, 
     title, 
     textStyles = "", 
-    containerStyles ="",
-}: SignInButtonProps) => {
+    containerStyles = "",
+    style, // Destructure `style` from props
+}: DarkButtonProps) => {
   return (
     <TouchableOpacity 
         activeOpacity={0.6}
-        // use backtick so we can use interpolation
+        style={style} // Apply inline styles here
         className={`flex flex-row items-center justify-center bg-secondary-green rounded-full py-5 w-3/4 ${containerStyles}`}
-        // className="flex flex-row items-center justify-center bg-custom-background border-custom-green border-2 rounded-full py-3 mt-4 w-full"
         onPress={onPress}
     >
         <Text className={`font-semibold text-white text-lg ${textStyles}`}>
@@ -34,4 +31,4 @@ const SignInButton = ({
   );
 };
 
-export default SignInButton;
+export default DarkButton;
