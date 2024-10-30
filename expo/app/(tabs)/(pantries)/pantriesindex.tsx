@@ -22,7 +22,22 @@ const Pantries = () => {
       {
         id: 2,
         title: "Pantry 2",
-        imageSource: Images.defaultPantry,
+        imageSource: Images.other,
+      },
+      {
+        id: 3,
+        title: "Pantry 3",
+        imageSource: Images.protein,
+      },
+      {
+        id: 4,
+        title: "Pantry 4",
+        imageSource: Images.vegetables,
+      },
+      {
+        id: 5,
+        title: "Pantry 5",
+        imageSource: Images.condiments,
       },
       // Add more pantry items as needed
     ];
@@ -36,15 +51,18 @@ const Pantries = () => {
         style={{ margin: 15 }}
       />
       <Text></Text>
-      {/** TODO: MAKE THIS DYNAMICALLY POPULATE FOR A LIST OF JSON TITLES (and images if we want) */}
+      {/** DYNAMICALLY POPULATE FOR A LIST OF JSON! */}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="bg-custom-background">
       {pantryData.map((pantry) => (
-        <PantryButton 
-          key={pantry.id}
-          title={pantry.title} 
-          onPress={() => router.push("./individualpantry")} 
-          imageSource={pantry.imageSource} 
-        />
+        <View className="mt-5">
+          <PantryButton 
+            key={pantry.id}
+            title={pantry.title} 
+            onPress={() => router.push("./individualpantry")} //want to push the individual pantry AND pantry data to the thing I think
+            imageSource={pantry.imageSource} 
+          />
+        </View>
+
       ))}
     </ScrollView>
     </View>

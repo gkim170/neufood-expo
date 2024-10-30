@@ -9,6 +9,7 @@ import network from "@/assets/images/about/network.png";
 import recipe from "@/assets/images/about/recipe.png";
 import time from "@/assets/images/about/time.png";
 import defaultPantry from "@/assets/images/pantries/pantry-default-img.png";
+import infoIcon from "@/assets/images/pantries/infoIcon.png";
 import condiments from "@/assets/images/pantries/ingredients/condiments.png";
 import dairy from "@/assets/images/pantries/ingredients/dairy.png";
 import desserts from "@/assets/images/pantries/ingredients/desserts.png";
@@ -45,5 +46,6 @@ export default {
     snacks,
     spices,
     spreads,
-    vegetables
+    vegetables,
+    infoIcon
 };
