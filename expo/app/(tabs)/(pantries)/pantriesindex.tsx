@@ -125,7 +125,7 @@ const Pantries = () => {
               
               {/* Submit Button */}
               <TouchableOpacity onPress={submitPantry} style={{ padding: 10, backgroundColor: Colors.darkerGreen, borderRadius: 5, alignItems: 'center'  }}>
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>Add Ingredient</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold' }}>Add Pantry</Text>
               </TouchableOpacity>
 
               {/* Close Button */}
