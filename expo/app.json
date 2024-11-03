@@ -14,9 +14,11 @@
       "backgroundColor": "#FAF6EB"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.neufoodies.neufood"
     },
     "android": {
+      "package": "com.neufoodies.neufood",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -32,6 +34,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "75e7f43e-c6d9-4547-9803-d405c3e49340"
+      }
     }
   }
 }
