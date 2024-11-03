@@ -134,8 +134,6 @@ const IndividualPantry = () => {
         onPress={handleAddIngredient} 
         title="Add Ingredient" />
       </View>
-      
-
 
       {ingredients.length === 0 ? (//
         // No ingredients view
@@ -165,7 +163,7 @@ const IndividualPantry = () => {
           {/* Ingredient Grid (flatlist is scrollable!) */}
           <FlatList
             data={ingredients}
-            contentContainerStyle={{ alignItems: 'center' }}
+            contentContainerStyle={{ alignItems: 'center', paddingBottom: 215 }}
             keyExtractor={(item, index) => index.toString()}
             numColumns={2} // Set to two columns
             renderItem={({ item }) => (
@@ -208,8 +206,6 @@ const IndividualPantry = () => {
                     style={{ width: 20, height: 20 }}
                   />
                 </TouchableOpacity>
-
-                
               </TouchableOpacity>
             )}
           />
