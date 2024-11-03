@@ -23,6 +23,7 @@ import snacks from "@/assets/images/pantries/ingredients/snacks.png";
 import spices from "@/assets/images/pantries/ingredients/spices.png";
 import spreads from "@/assets/images/pantries/ingredients/spreads.png";
 import vegetables from "@/assets/images/pantries/ingredients/vegetables.png";
+import profpic from "@/assets/images/profile/profilepic.png"
 
 export default {
     logo,
@@ -47,5 +48,6 @@ export default {
     spices,
     spreads,
     vegetables,
-    infoIcon
+    infoIcon,
+    profpic,
 };
