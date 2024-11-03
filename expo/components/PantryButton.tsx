@@ -26,7 +26,7 @@ const PantryButton = ({
     <TouchableOpacity
       onPress={onPress}
       style={{ //general styling options, can change whenever for overall button
-        width: '90%',
+        width: 250,
         height: 200,
         borderRadius: 15,
         backgroundColor: Colors.primaryGreen,
@@ -44,8 +44,8 @@ const PantryButton = ({
       <Image
         source={imageSource} // Use the dynamic image source so we can change image in future if we want
         style={{ //same deal here depending on how we want the image to look.
-          width: '70%',
-          height: '85%',
+          width: 120,
+          height: 120,
           borderRadius: 10, //tweak with that
         }}
         resizeMode="cover"
