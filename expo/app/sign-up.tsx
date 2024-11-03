@@ -6,13 +6,10 @@ import SignInButton from '@/components/DarkButton';
 import GoogleButton from '@/components/GoogleButton';
 import axios, { AxiosError } from 'axios';
 import * as Google from 'expo-auth-session/providers/google';
-import { ResponseType } from 'expo-auth-session';
 
 const url = process.env.EXPO_PUBLIC_API_URL;
-const clientIdId = process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID;
-const iosIdId = process.env.EXPO_PUBLIC_GOOGLE_IOS_ID;
-const androidIdId = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_ID;
-const webIdId = process.env.EXPO_PUBLIC_GOOGLE_WEB_ID;
+const googleWebId = process.env.EXPO_PUBLIC_GOOGLE_WEB_ID;
+const redirectVar = process.env.EXPO_PUBLIC_GOOGLE_REDIRECT_URI;
 
 // Define the expected structure of your error response
 interface ErrorResponse {
@@ -25,37 +22,45 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Set up Google OAuth request
+  // Google OAuth configuration using useAuthRequest
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: `${clientIdId}.apps.googleusercontent.com`, // Expo client ID
-    iosClientId: `${iosIdId}.apps.googleusercontent.com`,
-    androidClientId: `${androidIdId}.apps.googleusercontent.com`,
-    webClientId: `${webIdId}.apps.googleusercontent.com`,
-    responseType: ResponseType.IdToken,
+    clientId: googleWebId,
+    redirectUri: redirectVar, // Explicitly set redirect URI to match Google Console
+    responseType: 'id_token',
   });
 
   useEffect(() => {
-    if (response?.type === 'success') {
-      const { id_token } = response.params;
-      handleGoogleSignUp(id_token);
+    if (response?.type === 'success' && response.params.id_token) {
+      const idToken = response.params.id_token;
+      handleGoogleSignUp(idToken);
+    } else if (response?.type === 'error') {
+      console.error('OAuth error:', response.error);
+      Alert.alert('Error', 'An error occurred during Google sign-up.');
     }
   }, [response]);
 
-  // Traditional Sign-Up Handler
   const handleSignUp = async () => {
     const name = `${firstName} ${lastName}`;
+  
     try {
+      // Make a POST request to the backend server
       const response = await axios.post(`${url}/auth/register`, {
         name,
         email,
         password,
       });
+  
+      // Log the response from the server
       console.log('Sign-up successful:', response.data);
-      Alert.alert('Success', 'User registered successfully!');
+      Alert.alert('Success', 'User registered successfully!'); // Optional: to give feedback to the user
+  
     } catch (error) {
       const axiosError = error as AxiosError;
+  
       if (axiosError.response) {
+        // Assert that response.data matches the ErrorResponse structure
         const errorData = axiosError.response.data as ErrorResponse;
+        
         console.error('Error during sign-up:', errorData.message);
         Alert.alert('Error', errorData.message || 'Server error. Please try again.');
       } else {
@@ -65,7 +70,6 @@ const SignUp = () => {
     }
   };
 
-  // Google Sign-Up Handler
   const handleGoogleSignUp = async (idToken: string) => {
     try {
       const result = await axios.post(`${url}/auth/google`, {
@@ -121,14 +125,9 @@ const SignUp = () => {
         placeholderTextColor="#6D6868"
       />
 
-      <SignInButton
-        onPress={handleSignUp}
-        title={'Sign Up'}
-      />
+      <SignInButton onPress={handleSignUp} title={'Sign Up'} />
 
-      <GoogleButton
-        onPress={() => promptAsync()}
-      />
+      <GoogleButton onPress={() => promptAsync()} />
 
       <View className="flex mt-4">
         <Text className="font-primary text-gray-600">
