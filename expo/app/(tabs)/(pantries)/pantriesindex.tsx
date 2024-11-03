@@ -41,6 +41,12 @@ const Pantries = () => {
     const handleAddPantry = () => {
       setModalVisible(true);
     };
+      // removes previously added words if the thing is bad and you change your mind
+    const handleCancelAdd = () => {
+      setModalVisible(false);
+      setPantryName('');
+      setCollaborators('');
+    };
 
     // Function to handle adding pantry (e.g., submitting the form) after the user inputs text. 
     const submitPantry = () => {
@@ -123,7 +129,7 @@ const Pantries = () => {
               </TouchableOpacity>
 
               {/* Close Button */}
-              <TouchableOpacity onPress={() => setModalVisible(false)} style={{ marginTop: 10, alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => handleCancelAdd()} style={{ marginTop: 10, alignItems: 'center' }}>
                 <Text style={{ color: 'grey' }}>Cancel</Text>
               </TouchableOpacity>
             </View>
