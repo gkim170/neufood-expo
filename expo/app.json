@@ -1,37 +1,47 @@
 {
- "expo": {
-   "name": "neufood",
-   "slug": "neufood",
-   "version": "1.0.0",
-   "orientation": "portrait",
-   "icon": "./assets/images/logo/logo-background.png",
-   "scheme": "myapp",
-   "userInterfaceStyle": "automatic",
-   "splash": {
-     "image": "./assets/images/logo/logo-transparent-padded.png",
-     "resizeMode": "contain",
-     "imageScaleMode": "scale",
-     "backgroundColor": "#FAF6EB"
-   },
-   "ios": {
-     "supportsTablet": true
-   },
-   "android": {
-     "adaptiveIcon": {
-       "foregroundImage": "./assets/images/adaptive-icon.png",
-       "backgroundColor": "#ffffff"
-     }
-   },
-   "web": {
-     "bundler": "metro",
-     "output": "static",
-     "favicon": "./assets/images/favicon.png"
-   },
-   "plugins": [
-     "expo-router"
-   ],
-   "experiments": {
-     "typedRoutes": true
-   }
- }
+  "expo": {
+    "name": "neufood",
+    "slug": "neufood",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo/logo-background.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/logo/logo-transparent.png",
+      "resizeMode": "contain",
+      "imageScaleMode": "scale",
+      "backgroundColor": "#FAF6EB"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.neufoodies.neufood"
+    },
+    "android": {
+      "package": "com.neufoodies.neufood",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "75e7f43e-c6d9-4547-9803-d405c3e49340"
+      }
+    }
+  }
 }
