@@ -5,6 +5,8 @@ import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
 import ButtonGrid from '@/components/RecipeButtonGrid';
 import axios, { AxiosError } from 'axios';
+import PantryButton from '@/components/PantryButton';
+import Images from '@/constants/images';
 
 const UID = "333";
 const url = process.env.EXPO_PUBLIC_API_URL;
@@ -78,36 +80,47 @@ const Selection = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-custom-background">
+
       <View className="flex-1 justify-start">
         <BackArrow />
         <Text className="font-primary text-l mt-7 mb-4 mx-10 px-6">
           We match your pantry, taste profile, preferences, and allergies to find tailored recipes!
         </Text>
         <ButtonGrid/>
+
         <View className="justify-left">
           <Text className="font-bold text-xl mt-2 mb-2 px-10">
             Pantries
           </Text>
         </View>
-          {/* Display a flat list of pantry names */}
-          {/* Going to change this to a flatlist of styled pantry component */}
+
+          {/* Display a flat list of PantryButton components with the name and a hard coded image for now */}
+        <View className="items-center">
           <FlatList
             data={pantries}
             keyExtractor={(item) => item.pantryId}
             renderItem={({ item }) => (
-              // Right not onPress is just a console log but changing to change state of the selected pantry
-              <TouchableOpacity onPress={() => console.log(`Selected ${item.pantryName}`)}>
-                <Text className="mx-10 p-2">{item.pantryName}</Text>
-              </TouchableOpacity>
+              <PantryButton
+                title={item.pantryName}
+                onPress={() => console.log(`Selected pantry ID: ${item.pantryId}`)} // Log pantry ID onPress
+                imageSource={Images.defaultPantry} // Pass defaultPantry image to imageSource for now
+              />
             )}
+            contentContainerStyle={{ paddingBottom: 300 }} // Makes it so you can see the bottom pantry fully when scrolling
+            showsVerticalScrollIndicator={false} 
           />
+        </View>
+
       </View>
+
+
       <View className="items-center mb-4">
         <DarkButton
           onPress={() => router.push('./generated')}
           title={'Show Me Recipes'}
         />
       </View>
+
     </SafeAreaView>
   );
 };
