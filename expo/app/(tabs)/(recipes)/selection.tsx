@@ -1,12 +1,13 @@
-import { View, Text, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, SafeAreaView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import DarkButton from '../../../components/DarkButton';
 import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
 import ButtonGrid from '@/components/RecipeButtonGrid';
 import axios, { AxiosError } from 'axios';
-import PantryButton from '@/components/PantryButton';
+import RecipesPantryButton from '@/components/RecipesPantryButton';
 import Images from '@/constants/images';
+import { Colors } from '@/constants/Colors';
 
 const UID = "333";
 const url = process.env.EXPO_PUBLIC_API_URL;
@@ -22,6 +23,7 @@ interface PantryDetails {
 
 const Selection = () => {
   const [pantries, setPantries] = useState<PantryDetails[]>([]);
+  const [selectedPantryId, setSelectedPantryId] = useState<string | null>(null); // State to keep track of selected pantry, there can only be one and you have to pick one
 
   useEffect(() => {
     console.log('Recipe generator selections page rendered');
@@ -80,7 +82,6 @@ const Selection = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-custom-background">
-
       <View className="flex-1 justify-start">
         <BackArrow />
         <Text className="font-primary text-l mt-7 mb-4 mx-10 px-6">
@@ -94,25 +95,27 @@ const Selection = () => {
           </Text>
         </View>
 
-          {/* Display a flat list of PantryButton components with the name and a hard coded image for now */}
+        {/* Display a flat list of PantryButton components with the name and a hard coded image for now */}
         <View className="items-center">
           <FlatList
-            data={pantries}
-            keyExtractor={(item) => item.pantryId}
-            renderItem={({ item }) => (
-              <PantryButton
-                title={item.pantryName}
-                onPress={() => console.log(`Selected pantry ID: ${item.pantryId}`)} // Log pantry ID onPress
-                imageSource={Images.defaultPantry} // Pass defaultPantry image to imageSource for now
-              />
-            )}
-            contentContainerStyle={{ paddingBottom: 300 }} // Makes it so you can see the bottom pantry fully when scrolling
-            showsVerticalScrollIndicator={false} 
-          />
+              data={pantries}
+              keyExtractor={(item) => item.pantryId}
+              renderItem={({ item }) => (
+                <RecipesPantryButton
+                  title={item.pantryName}
+                  onPress={() => {
+                    console.log(`Selected pantry ID: ${item.pantryId}`);
+                    setSelectedPantryId(item.pantryId); // Update the selected pantry ID to the one pressed
+                  }}
+                  imageSource={Images.defaultPantry} // Pass defaultPantry image to imageSource for now
+                  isSelected={selectedPantryId === item.pantryId} // Check if this pantry is selected
+                />
+              )}
+              contentContainerStyle={{ paddingBottom: 300 }} // Makes it so you can see the bottom pantry fully when scrolling
+              showsVerticalScrollIndicator={false} 
+            />
         </View>
-
       </View>
-
 
       <View className="items-center mb-4">
         <DarkButton
@@ -120,7 +123,6 @@ const Selection = () => {
           title={'Show Me Recipes'}
         />
       </View>
-
     </SafeAreaView>
   );
 };
