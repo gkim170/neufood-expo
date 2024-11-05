@@ -33,12 +33,6 @@ const ProfilePage = () => {
       user,
       updateUser: (updatedUser) => setUser(updatedUser),
      });
-
-
-    // Check if result is available to update profileData
-    // if (result) {
-    //   setProfileData(result);
-    // }
   }
 
   // function to navigate to notifications

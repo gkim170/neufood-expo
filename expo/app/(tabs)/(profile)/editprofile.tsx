@@ -50,14 +50,14 @@ const editProfile = () => {
 
     setError(''); // Clear error if validation passes
     console.log('Form Submitted.', `Name: ${firstname + ' ' + lastname}, Email: ${email}`, ` image: ${selectedImage}`);
-    // more actions
 
+    // format the value to be passed back to profile home page
     const data = {firstname, lastname, email, passwd, selectedImage};
     route.params.updateUser(data);
     navigation.goBack();
   };
 
-
+  // function to choose an image
   const pickImageAsync = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
           allowsEditing: true,
@@ -93,7 +93,7 @@ const editProfile = () => {
         {/* input for first name */}
         <TextInput
           style={[styles.input, error && !firstname ? styles.errorInput : null]}
-          placeholder="First *"
+          placeholder={user.firstname == 'User' ? "First *" : user.firstname}
           placeholderTextColor="#888"
           value={firstname}
           onChangeText={setFirstName}
@@ -102,7 +102,7 @@ const editProfile = () => {
         {/* input for last name */}
         <TextInput
           style={[styles.input, error && !lastname ? styles.errorInput : null]}
-          placeholder="Last"
+          placeholder={user.lastname == '' ? "Last" : user.lastname}
           placeholderTextColor="#888"
           value={lastname}
           onChangeText={setLastName}
@@ -111,7 +111,7 @@ const editProfile = () => {
         {/* input for email */}
         <TextInput
           style={[styles.input, error && !email ? styles.errorInput : null]}
-          placeholder="Email *"
+          placeholder={user.email == 'neufood@example.com' ? "Email *" : user.email}
           placeholderTextColor="#888"
           value={email}
           onChangeText={setEmail}
@@ -121,7 +121,7 @@ const editProfile = () => {
         {/* input for password */}
         <TextInput
           style={[styles.input, error && !lastname ? styles.errorInput : null]}
-          placeholder="Password *"
+          placeholder={user.passwd == '' ? "Password *" : user.passwd}
           placeholderTextColor="#888"
           value={passwd}
           onChangeText={setPasswd}
