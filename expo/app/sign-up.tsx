@@ -1,10 +1,11 @@
 import { View, Text, TextInput, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import React, { useState } from 'react';
 import BackArrow from '@/components/BackArrow';
-import { Link } from 'expo-router';
-import SignInButton from '@/components/DarkButton'; // Assuming similar button component exists
+import { Link, router } from 'expo-router';
+import SignInButton from '@/components/DarkButton';
 import GoogleButton from '@/components/GoogleButton';
 import axios, { AxiosError } from 'axios';
+import WelcomeModal from '@/components/WelcomeModal'; // Import the custom modal
 
 const url = process.env.EXPO_PUBLIC_API_URL;
 
@@ -18,6 +19,8 @@ const SignUp = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [userName, setUserName] = useState('');
 
   const handleSignUp = async () => {
     const name = `${firstName} ${lastName}`;
@@ -29,11 +32,16 @@ const SignUp = () => {
         email,
         password,
       });
-  
-      // Log the response from the server
-      console.log('Sign-up successful:', response.data);
-      Alert.alert('Success', 'User registered successfully!'); // Optional: to give feedback to the user
-  
+
+      const { uid } = response.data; // Assuming the response includes UID as "uid"
+      
+      // Fetch user info to get the name for the welcome message
+      const userResponse = await axios.get(`${url}/users/${uid}`);
+      setUserName(userResponse.data.name);  // Assuming the response includes "name"
+      
+      // Show the welcome modal
+      setShowModal(true);
+
     } catch (error) {
       const axiosError = error as AxiosError;
   
@@ -50,14 +58,14 @@ const SignUp = () => {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Handle Google sign-in logic
-    console.log('Sign in with Google');
+  const handleModalClose = () => {
+    setShowModal(false);
+    router.push(`/(home)?uid=${userName}`);
   };
 
   return (
     <View className="flex-1 justify-center items-center bg-custom-background px-10">
-        <StatusBar barStyle="dark-content"/>
+      <StatusBar barStyle="dark-content"/>
       {/* Back Arrow */}
       <BackArrow />
 
@@ -110,10 +118,17 @@ const SignUp = () => {
         title={'Sign Up'}
       />
 
-        {/* Sign In with Google Button */}
-        <GoogleButton
-        onPress={handleGoogleSignIn}
-        />
+      {/* Sign In with Google Button */}
+      <GoogleButton
+        onPress={() => console.log('Sign in with Google')}
+      />
+
+      {/* Success Modal */}
+      <WelcomeModal
+        visible={showModal}
+        name={userName}
+        onAnimationEnd={handleModalClose}
+      />
 
       {/* Link to Sign In */}
       <View className="flex mt-4">
