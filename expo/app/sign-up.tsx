@@ -11,6 +11,8 @@ const url = process.env.EXPO_PUBLIC_API_URL;
 const googleWebId = process.env.EXPO_PUBLIC_GOOGLE_WEB_ID;
 const redirectVar = process.env.EXPO_PUBLIC_GOOGLE_REDIRECT_URI;
 
+// branch strictly for the addition of Google Sign Up / Sign In
+
 // Define the expected structure of your error response
 interface ErrorResponse {
   message: string;
