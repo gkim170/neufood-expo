@@ -7,63 +7,121 @@ import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
 
 const IndividualPantry = () => {
-  //constructor type beat for ingredient table should be same model as DB (maybe types mismatch)
-  type Ingredient = {
-    name: string;
-    totalPrice: number;
-    category: string;
-    expirationDate: string;
-    quantity: number;
-    image: any; // You could use ImageSourcePropType from 'react-native' if you're working with React Native images
+    // State to control modal visibility within handlers
+    const [selectedPantryId, setSelectedPantryId] = useState("1"); // Set default selected pantry
+    const [modalVisible, setModalVisible] = useState(false);
+    const [ingredientName, setIngredientName] = useState('');
+    const [totalPrice, setTotalPrice] = useState('');
+    const [category, setCategory] = useState('');
+    const [categoryOpen, setCategoryOpen] = useState(false);
+    const [expirationDate, setExpirationDate] = useState('');
+    const [quantity, setQuantity] = useState('');
+
+  //test data constructors to make sure we're pushing the correct types to the array according to mongoose
+  type Collaborator = {
+    uid?: string;
   };
-  //data for testing!!!
-  const [ingredients, setIngredients] = useState<Ingredient[]>([    
+  
+  type Ingredient = {
+    name?: string;
+    category?: string;
+    quantity?: number;
+    unitPrice?: number;
+    totalPrice?: number;
+    purchaseDate?: Date;
+    expDate?: Date;
+    imageSource?: any; //THIS CURRENTLY ISN'T OUR DB SOLUTION AND WE NEED TO CHANGE THIS
+  };
+  
+  type Pantry = {
+    pantryId?: string;
+    name?: string;
+    ownerId?: string;
+    collaborators?: Collaborator[];
+    ingredients?: Ingredient[];
+    imageSource?: any;
+  };
+  
+  // Test data for pantries
+  const [pantryData, setPantryData] = useState<Pantry[]>([
     {
-    name: "Tomato",
-    totalPrice: 10,
-    category: "Vegetables",
-    expirationDate: "2024-11-15",
-    quantity: 5,
-    image: Images.vegetables,
-    },  
+      pantryId: "1",
+      name: "Pantry 1",
+      ownerId: "owner1",
+      collaborators: [{ uid: "user2" }, { uid: "user3" }],
+      ingredients: [
+        {
+          name: "Apples",
+          category: "Fruit",
+          quantity: 100,
+          unitPrice: 0.5,
+          totalPrice: 5,
+          purchaseDate: new Date('2024-01-01'),
+          expDate: new Date('2024-01-10'),
+          imageSource: Images.fruits,
+        },
+        {
+          name: "Chicken Breast",
+          category: "Meat",
+          quantity: 522,
+          unitPrice: 2.0,
+          totalPrice: 10,
+          purchaseDate: new Date('2024-01-01'),
+          expDate: new Date('2024-01-05'),
+          imageSource: Images.protein,
+        }
+      ],
+      imageSource: Images.defaultPantry,
+    },
     {
-    name: "Steak",
-    totalPrice: 10,
-    category: "Protein",
-    expirationDate: "2024-11-15",
-    quantity: 50,
-    image: Images.protein,
-    },  
+      pantryId: "2",
+      name: "Protein Pantry",
+      ownerId: "owner2",
+      collaborators: [{ uid: "user4" }],
+      ingredients: [
+        {
+          name: "Protein Powder",
+          category: "Supplements",
+          quantity: 12,
+          unitPrice: 20.0,
+          totalPrice: 20,
+          purchaseDate: new Date('2024-02-01'),
+          expDate: new Date('2025-02-01'),
+          imageSource: Images.spices,
+        }
+      ],
+      imageSource: Images.protein,
+    },
     {
-    name: "Flour",
-    totalPrice: 10,
-    category: "Grains",
-    expirationDate: "2024-11-15",
-    quantity: 500,
-    image: Images.grains,
-    },  
-    {
-    name: "Red Pepper Flakes",
-    totalPrice: 10,
-    category: "Spices",
-    expirationDate: "2024-11-15",
-    quantity: 5000,
-    image: Images.spices,
-    },  
+      pantryId: "3",
+      name: "Grain Pantry",
+      ownerId: "owner3",
+      collaborators: [{ uid: "user4" }],
+      ingredients: [
+        {
+          name: "Wheat",
+          category: "Grains",
+          quantity: 1123,
+          unitPrice: 20.0,
+          totalPrice: 20,
+          purchaseDate: new Date('2024-02-01'),
+          expDate: new Date('2025-02-01'),
+          imageSource: Images.grains,
+        },
+        {
+          name: "Barley",
+          category: "Grains",
+          quantity: 122211,
+          unitPrice: 20.0,
+          totalPrice: 200000,
+          purchaseDate: new Date('2024-02-01'),
+          expDate: new Date('2025-02-01'),
+          imageSource: Images.grains,
+        },
+      ],
+      imageSource: Images.grains,
+    },
   ]);
-  //pantries data for testing but currently doesn't get populated from single source.
-  //need to GET all pantries where uid = current uid
-  const [pantries, setPantries] = useState([    
-    { id: 1, name: 'Pantry A' },
-    { id: 2, name: 'Pantry B' },
-    { id: 3, name: 'Pantry C' },  
-    { id: 4, name: 'Pantry D' },  
-    { id: 5, name: 'Pantry E' },  
-    { id: 6, name: 'Pantry F' },  
-    { id: 7, name: 'Pantry G' },  
-    { id: 8, name: 'Pantry H' },  
-  ]);
-  const [selectedPantry, setSelectedPantry] = useState<number | null>(null);
 
   const categories = [
     { label: 'Dairy', value: 'Dairy' },
@@ -81,20 +139,10 @@ const IndividualPantry = () => {
     { label: 'Other', value: 'Other' },
   ];
 
-  // Used to make sure we get here correctly (for testing), can see this log in the terminal
-  useEffect(() => {
-    console.log('Individual pantry page rendered');
-  }, []);
+  type ImageKeys =  'protein' | 'dairy' | 'fruits' | 'vegetables' | 'grains' | 'protein' | 'oils' | 'condiments' | 'snacks' | 'desserts' | 'drinks' | 'spices' | 'spreads' | 'other';
 
-  // Handler for adding ingredients
-  // State to control modal visibility
-  const [modalVisible, setModalVisible] = useState(false);
-  const [ingredientName, setIngredientName] = useState('');
-  const [totalPrice, setTotalPrice] = useState('');
-  const [category, setCategory] = useState('');
-  const [categoryOpen, setCategoryOpen] = useState(false); //make sure we see if the category dropdown is open or not
-  const [expirationDate, setExpirationDate] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const selectedPantry = pantryData.find((pantry) => pantry.pantryId === selectedPantryId);
+  const ingredients = (selectedPantry?.ingredients ?? []) as Ingredient[];
 
   // Handler for adding ingredients, toggles modal visibility
   const handleAddIngredient = () => {
@@ -112,26 +160,31 @@ const IndividualPantry = () => {
 
   // Function to handle adding ingredient (e.g., submitting the form)
   const submitIngredient = () => {
-    const imageKey = category.toLowerCase(); // Matches image keys to the correct image in order to use it
+    const imageKey = category.toLowerCase() as ImageKeys;
     const newIngredient = {
       name: ingredientName,
       totalPrice: Number(totalPrice),
       category,
       expirationDate,
       quantity: Number(quantity),
-      image: Images.other, // need to find a way to make this work with imageKey (Images.imageKey)
-    }
+      image: Images[imageKey] || Images.other, // Use category-matched image or default
+    };
     //TODO: MAKE THIS HIT THE ROUTE actually!
     console.log("Adding ingredient:", ingredientName, totalPrice, category, expirationDate, quantity);
-    setIngredients([...ingredients, newIngredient]);
-    // Clear input and close modal
-    setIngredientName('');
-    setTotalPrice('');
-    setCategory('');
-    setExpirationDate('');
-    setQuantity('');
-    setModalVisible(false);
+    const updatedPantryData = pantryData.map((pantry) => 
+      pantry.pantryId === selectedPantryId
+        ? { ...pantry, ingredients: [...(pantry.ingredients) || [], newIngredient] }
+        : pantry
+    );
+    setPantryData(updatedPantryData);
+
+    handleCancelAdd();
   };
+
+  // Used to make sure we get here correctly (for testing), can see this log in the terminal
+  useEffect(() => {
+    console.log('Individual pantry page rendered');
+  }, []);
 
   return (
     <View className="flex-1 bg-custom-background p-4">
@@ -141,25 +194,26 @@ const IndividualPantry = () => {
         <FlatList
           style={{marginLeft: 50}}
           horizontal
-          data={pantries}
-          keyExtractor={(item) => item.id.toString()}
+          data={pantryData}
+          keyExtractor={(item: Pantry) => item.pantryId!}
           showsHorizontalScrollIndicator={true}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => setSelectedPantry(item.id )}
+              onPress={() => setSelectedPantryId(item.pantryId!)}
               style={{
                 padding: 10,
-                backgroundColor: selectedPantry === item.id ? Colors.darkGreen : Colors.primaryGreen,
+                backgroundColor: selectedPantry === item.pantryId ? Colors.darkGreen : Colors.primaryGreen,
                 marginRight: 10,
                 marginLeft: 5,
                 marginTop: 20,
                 borderRadius: 5,
-                height: 65,
-                width: 120,
+                height: 50,
+                minWidth: 150,
                 alignItems: 'center',
+                flex: 1,
               }}
             >
-              <Text style={{ justifyContent: 'center', fontSize: 20, color: selectedPantry === item.id ? '#FFF' : '#000' }}>
+              <Text style={{ justifyContent: 'center', fontSize: 20, color: selectedPantry === item.pantryId ? '#FFF' : '#000' }}>
                 {item.name}
               </Text>
             </TouchableOpacity>
@@ -309,15 +363,21 @@ const IndividualPantry = () => {
               <TouchableOpacity
                 className="p-4 m-2 rounded-md shadow"
                 onPress={() => console.log("Ingredient clicked")}
-                style={{ backgroundColor: Colors.primaryPink ,position: 'relative',width:150, }} // Position for the icon
+                style={{ backgroundColor: Colors.primaryPink, position: 'relative', width: 150 }} // Position for the icon
               >
-                <Image source={item.image || Images.other} className="w-12 h-12" />
+                {/* Dynamic image sourcing based on category */}
+                <Image 
+                  source={item.imageSource || Images.other} 
+                  className="w-12 h-12" 
+                />
                 <Text className="font-bold mt-2">{item.name}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                  <Text style={{fontWeight: 'bold', minWidth:10, textAlign: 'left'}}>Q: {item.quantity}</Text>
+                  <Text style={{ fontWeight: 'bold', minWidth: 10, textAlign: 'left' }}>
+                    Q: {item.quantity}
+                  </Text>
                   {/* Pill-shaped button for Use */}
                   <TouchableOpacity
-                    onPress={() => console.log("Using ingredient")}//should decrement the couter and push to thing
+                    onPress={() => console.log("Using ingredient")} // Should decrement the counter and push to thing
                     style={{
                       backgroundColor: '#FFF', // Change to your desired color
                       borderRadius: 20, // Pill shape

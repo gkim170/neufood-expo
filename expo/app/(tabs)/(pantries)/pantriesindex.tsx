@@ -12,31 +12,124 @@ const Pantries = () => {
       console.log('Pantries page rendered');
     }, []);
 
-    //test data constructor to make sure we're pushing the correct types to the array
-    type Pantry = {
-      id: Number,
-      title: string,
-      imageSource: any,
+    //test data constructors to make sure we're pushing the correct types to the array
+    type Collaborator = {
+      uid: string;
     };
-    //data for testing pantries!!!
-    const [pantryData, setPantryData] = useState<Pantry[]>([    
+    
+    type Ingredient = {
+      name: string;
+      category: string;
+      quantity: number;
+      unitPrice: number;
+      totalPrice: number;
+      purchaseDate: Date;
+      expDate: Date;
+      imageSource?: any;
+    };
+    
+    type Pantry = {
+      pantryId?: string;
+      name?: string;
+      ownerId?: string;
+      collaborators?: Collaborator[];
+      ingredients?: Ingredient[];
+      imageSource?: any;
+    };
+    
+    // Test data for pantries
+    const [pantryData, setPantryData] = useState<Pantry[]>([
       {
-      id: 1,
-      title: "Pantry 1",
-      imageSource: Images.defaultPantry,
+        pantryId: "1",
+        name: "Pantry 1",
+        ownerId: "owner1",
+        collaborators: [{ uid: "user2" }, { uid: "user3" }],
+        ingredients: [
+          {
+            name: "Apples",
+            category: "Fruit",
+            quantity: 10,
+            unitPrice: 0.5,
+            totalPrice: 5,
+            purchaseDate: new Date('2024-01-01'),
+            expDate: new Date('2024-01-10'),
+            imageSource: Images.fruits,
+          },
+          {
+            name: "Chicken Breast",
+            category: "Meat",
+            quantity: 5,
+            unitPrice: 2.0,
+            totalPrice: 10,
+            purchaseDate: new Date('2024-01-01'),
+            expDate: new Date('2024-01-05'),
+            imageSource: Images.protein,
+          }
+        ],
+        imageSource: Images.defaultPantry,
       },
-        {
-        id: 2,
-        title: "Protein Pantry",
+      {
+        pantryId: "2",
+        name: "Protein Pantry",
+        ownerId: "owner2",
+        collaborators: [{ uid: "user4" }],
+        ingredients: [
+          {
+            name: "Protein Powder",
+            category: "Supplements",
+            quantity: 1,
+            unitPrice: 20.0,
+            totalPrice: 20,
+            purchaseDate: new Date('2024-02-01'),
+            expDate: new Date('2025-02-01'),
+            imageSource: Images.protein,
+          }
+        ],
         imageSource: Images.protein,
+      },
+      {
+        pantryId: "3",
+        name: "Grain Pantry",
+        ownerId: "owner3",
+        collaborators: [{ uid: "user4" }],
+        ingredients: [
+          {
+            name: "Wheat",
+            category: "Grains",
+            quantity: 1,
+            unitPrice: 20.0,
+            totalPrice: 20,
+            purchaseDate: new Date('2024-02-01'),
+            expDate: new Date('2025-02-01'),
+            imageSource: Images.grains,
+          },
+          {
+            name: "Barley",
+            category: "Grains",
+            quantity: 1,
+            unitPrice: 20.0,
+            totalPrice: 200000,
+            purchaseDate: new Date('2024-02-01'),
+            expDate: new Date('2025-02-01'),
+            imageSource: Images.grains,
+          },
+        ],
+        imageSource: Images.grains,
       },
     ]);
     // stuff for adding pantry via modal (i like this better than navigating to multiple pages where data can be lost in transfer)
     // State to control modal visibility
     const [modalVisible, setModalVisible] = useState(false);
     const [pantryName, setPantryName] = useState('');
-    const [collaborators, setCollaborators] = useState('');
-
+    const [collaboratorInput, setCollaboratorInput] = useState(''); // Temporary input for a single collaborator
+    const [collaborators, setCollaborators] = useState<string[]>([]);
+    // Function to add collaborator to array
+    const addCollaborator = () => {
+      if (collaboratorInput.trim()) {
+        setCollaborators([...collaborators, collaboratorInput.trim()]);
+        setCollaboratorInput(''); // Clear input field after adding
+      }
+    };
     // Handler for adding ingredients, toggles modal visibility
     const handleAddPantry = () => {
       setModalVisible(true);
@@ -45,28 +138,29 @@ const Pantries = () => {
     const handleCancelAdd = () => {
       setModalVisible(false);
       setPantryName('');
-      setCollaborators('');
+      setCollaborators([]);
     };
 
     // Function to handle adding pantry (e.g., submitting the form) after the user inputs text. 
     const submitPantry = () => {
-      console.log("Adding pantry:", pantryName, collaborators);
       //TODO: for connecting to DB, hit route then populate newPantry with that data
-      let i = 3;
-      let getId = i++; //we would get this id back from the POST route ideally
+      let i = pantryData.length + 1;
+      let getId = i.toString(); //we would get this id back from the POST route ideally
       //const imageKey = category.toLowerCase(); // Matches image keys to the correct image in order to use it
       //TODO: enforce some sort of requirement/security check for this
       const newPantry = {
-        id: getId,
-        title: pantryName,
-        collaborators,
+        pantryId: getId,
+        name: pantryName,
+        ownerId: 'ownerId',
+        collaborators: collaborators.map(uid => ({ uid})),
         imageSource: Images.defaultPantry, //.imageKey
       }
       //make sure to post to DB first
+      console.log("Adding pantry:", pantryName, collaborators);
       setPantryData([...pantryData, newPantry]);
       // Clear input and close modal
       setPantryName('');
-      setCollaborators('');
+      setCollaborators([]);
       setModalVisible(false);
     };
   
@@ -103,26 +197,33 @@ const Pantries = () => {
                 style={{ 
                   borderRadius: 8,
                   padding: 8,
-                  marginBottom: 15,
+                  //marginBottom: 15, //somehow this looks bad with the 15
                   borderWidth: 1, 
                 }}
                 placeholderTextColor= "#000" // Set the placeholder text color
               />
-              {/** input collaborators*/}
-              <TextInput
-                placeholder="Collaborators"
-                value={collaborators}
-                onChangeText={setCollaborators}
-                inputMode="email"
-                style={{ 
-                  borderRadius: 8,
-                  padding: 8,
-                  marginBottom: 15,
-                  borderWidth: 1, 
-                }}
-                placeholderTextColor= "#000" // Set the placeholder text color
-              />
-              
+              {/** input and add collaborators*/}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                <TextInput
+                  placeholder="Collaborator Id"
+                  value={collaboratorInput}
+                  onChangeText={setCollaboratorInput}
+                  inputMode="email"
+                  style={{ 
+                    borderRadius: 8,
+                    padding: 8,
+                    marginBottom: 15,
+                    borderWidth: 1, 
+                    flex: 1,
+                  }}
+                  placeholderTextColor= "#000" // Set the placeholder text color
+                />
+                {/* Add collaborator Button */}
+                <TouchableOpacity onPress={addCollaborator} style={{ marginLeft: 20, marginBottom: 15,padding: 8, backgroundColor: Colors.darkerGreen, borderRadius: 5, alignItems: 'center'  }}>
+                  <Text style={{ color: 'white', fontWeight: 'bold' }}>Add</Text>
+                </TouchableOpacity>
+              </View>
+
               {/* Submit Button */}
               <TouchableOpacity onPress={submitPantry} style={{ padding: 10, backgroundColor: Colors.darkerGreen, borderRadius: 5, alignItems: 'center'  }}>
                 <Text style={{ color: 'white', fontWeight: 'bold' }}>Add Pantry</Text>
@@ -140,9 +241,9 @@ const Pantries = () => {
       {/** DYNAMICALLY POPULATE FOR A LIST OF JSON! */}
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 15}} className="bg-custom-background">
       {pantryData.map((pantry) => (
-        <View key={pantry.id} className="mt-5">{/** tbh dont know why this key is mad here and not anywhere else*/}
+        <View key={pantry.pantryId} className="mt-5">{/** tbh dont know why this key is mad here and not anywhere else*/}
           <PantryButton 
-            title={pantry.title} 
+            title={pantry.name!} 
             onPress={() => router.push("./individualpantry")} //want to push the individual pantry AND pantry data to the thing I think, but don't know how to logic that (unless default to nothing and then only populate when pantry clicked)
             imageSource={pantry.imageSource} 
           />
