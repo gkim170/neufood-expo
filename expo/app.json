@@ -8,7 +8,7 @@
     "scheme": "https",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/logo/logo-transparent.png",
+      "image": "./assets/images/logo/logo-transparent-padded.png",
       "resizeMode": "contain",
       "imageScaleMode": "scale",
       "backgroundColor": "#FAF6EB"
@@ -41,8 +41,7 @@
       },
       "eas": {
         "projectId": "75e7f43e-c6d9-4547-9803-d405c3e49340"
-      },
-      "authSessionRedirectUri": "https://auth.expo.io/@wolfsheim/neufood"
+      }
     }
   }
 }

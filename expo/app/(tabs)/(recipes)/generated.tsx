@@ -1,24 +1,29 @@
-import { View, Text } from 'react-native'
-import React, { useEffect } from 'react'
-import { StatusBar } from 'expo-status-bar';
-import CustomButton from '../../../components/CustomButton';
-import { router } from 'expo-router';
-import BackArrow from '@/components/BackArrow';
+import React from 'react';
+import { FlatList, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { mockRecipes } from './mockData';
+import RecipeCard from './recipeCard'; // Import the RecipeCard component
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Generated = () => {
-  // Used to make sure we get here correctly (for testing), can see this log in the terminal
-  useEffect(() => {
-    console.log('Generated recipes page rendered');
-  }, []);
+  const router = useRouter();
 
   return (
-    <View className="flex-1 justify-center items-center bg-custom-background">
-      <BackArrow/>
-      <Text className="font-bold text-2xl my-4">
-        Generated Recipes
-      </Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-custom-background px-8">
+      {/* List of the recipe cards, using mock data currently */}
+      <FlatList
+        data={mockRecipes}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => router.push(`/${item.id}`)}>
+            <RecipeCard recipe={item} />
+          </TouchableOpacity>
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
 export default Generated;
+
+

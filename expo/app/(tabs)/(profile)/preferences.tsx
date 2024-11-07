@@ -6,20 +6,21 @@ import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
 
 
-const Next = () => {
+const preferences = () => {
   // Used to make sure we get here correctly (for testing), can see this log in the terminal
   useEffect(() => {
-    console.log('Next pantries page rendered');
+    console.log('Preferences page rendered');
   }, []);
+
 
   return (
     <View className="flex-1 justify-center items-center bg-custom-background">
       <BackArrow/>
       <Text className="font-bold text-2xl my-4">
-        Next
+        Preferences
       </Text>
     </View>
   );
 };
 
-export default Next;
+export default preferences;
