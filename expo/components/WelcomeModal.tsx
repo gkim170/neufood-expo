@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, Animated, StyleSheet, Modal } from 'react-native';
 
 // Define the custom green color from your project’s styles
-const customGreen = '#4CAF50'; // Replace this with your actual green color if different
+const customGreen = '#C4D2A6'; // Replace this with your actual green color if different
 
 interface WelcomeModalProps {
   visible: boolean;
