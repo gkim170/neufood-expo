@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import DarkButton from '@/components/DarkButton';
 import PantryButton from '@/components/PantryButton';
-import RecipesPantryButton from '@/components/RecipesPantryButton';
 import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
 import axios, { AxiosError } from 'axios';
@@ -21,6 +20,12 @@ interface PantryDetails {
 }
 
 const Pantries = () => {
+    // stuff for adding pantry via modal (i like this better than navigating to multiple pages where data can be lost in transfer)
+    // State to control modal visibility
+    const [modalVisible, setModalVisible] = useState(false);
+    const [pantryName, setPantryName] = useState('');
+    const [collaboratorInput, setCollaboratorInput] = useState(''); // Temporary input for a single collaborator
+    const [collaborators, setCollaborators] = useState<string[]>([]);
     const [pantries, setPantries] = useState<PantryDetails[]>([]);
 
     // Used to make sure we get here correctly (for testing), can see this log in the terminal
@@ -29,12 +34,6 @@ const Pantries = () => {
       pantryListRetriever();
     }, []);
 
-    // stuff for adding pantry via modal (i like this better than navigating to multiple pages where data can be lost in transfer)
-    // State to control modal visibility
-    const [modalVisible, setModalVisible] = useState(false);
-    const [pantryName, setPantryName] = useState('');
-    const [collaboratorInput, setCollaboratorInput] = useState(''); // Temporary input for a single collaborator
-    const [collaborators, setCollaborators] = useState<string[]>([]);
     // Function to add collaborator to array
     const addCollaborator = () => {
       if (collaboratorInput.trim()) {
@@ -122,7 +121,7 @@ const Pantries = () => {
   };
 
   //database connection (thanks rory)
-  // Get the list of pantries from the user's pantry array using uid, which is currently hardcoded as 333
+  // Get the list of pantries from the user's pantry array using uid, which is currently hardcoded as long thor's
   const pantryListRetriever = async () => {
     try {
       // Send the get request to the database to get pantry ids
@@ -243,7 +242,7 @@ const Pantries = () => {
         <View key={pantry.pantryId} className="mt-5">{/** tbh dont know why this key is mad here and not anywhere else*/}
           <PantryButton 
             title={pantry.pantryName!} 
-            onPress={() => router.push("./individualpantry")} //want to push the individual pantry AND pantry data to the thing I think, but don't know how to logic that (unless default to nothing and then only populate when pantry clicked)
+            onPress={() => router.push(`./individualpantry?pantryId=${pantry.pantryId}`)} //want to push the pantry id that we just clicked because we want the default view to be the ingredients from that pantry
             imageSource={Images.defaultPantry} 
           />
         </View>
