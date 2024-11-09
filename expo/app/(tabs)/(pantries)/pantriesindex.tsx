@@ -1,122 +1,35 @@
-import { View, Text, Image, Modal, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, Image, FlatList, Modal, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import DarkButton from '@/components/DarkButton';
 import PantryButton from '@/components/PantryButton';
+import RecipesPantryButton from '@/components/RecipesPantryButton';
 import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
+import axios, { AxiosError } from 'axios';
+
+const UID = "333";
+const url = process.env.EXPO_PUBLIC_API_URL;
+
+interface ErrorResponse {
+  message: string;
+}
+
+interface PantryDetails {
+  pantryId: string;
+  pantryName: string;
+}
 
 const Pantries = () => {
+    const [pantries, setPantries] = useState<PantryDetails[]>([]);
+    const [selectedPantryId, setSelectedPantryId] = useState<string | null>(null); // State to keep track of selected pantry, there can only be one and you have to pick one
+
     // Used to make sure we get here correctly (for testing), can see this log in the terminal
     useEffect(() => {
       console.log('Pantries page rendered');
+      pantryListRetriever();
     }, []);
 
-    //test data constructors to make sure we're pushing the correct types to the array
-    type Collaborator = {
-      uid: string;
-    };
-    
-    type Ingredient = {
-      name: string;
-      category: string;
-      quantity: number;
-      unitPrice: number;
-      totalPrice: number;
-      purchaseDate: Date;
-      expDate: Date;
-      imageSource?: any;
-    };
-    
-    type Pantry = {
-      pantryId?: string;
-      name?: string;
-      ownerId?: string;
-      collaborators?: Collaborator[];
-      ingredients?: Ingredient[];
-      imageSource?: any;
-    };
-    
-    // Test data for pantries
-    const [pantryData, setPantryData] = useState<Pantry[]>([
-      {
-        pantryId: "1",
-        name: "Pantry 1",
-        ownerId: "owner1",
-        collaborators: [{ uid: "user2" }, { uid: "user3" }],
-        ingredients: [
-          {
-            name: "Apples",
-            category: "Fruit",
-            quantity: 10,
-            unitPrice: 0.5,
-            totalPrice: 5,
-            purchaseDate: new Date('2024-01-01'),
-            expDate: new Date('2024-01-10'),
-            imageSource: Images.fruits,
-          },
-          {
-            name: "Chicken Breast",
-            category: "Meat",
-            quantity: 5,
-            unitPrice: 2.0,
-            totalPrice: 10,
-            purchaseDate: new Date('2024-01-01'),
-            expDate: new Date('2024-01-05'),
-            imageSource: Images.protein,
-          }
-        ],
-        imageSource: Images.defaultPantry,
-      },
-      {
-        pantryId: "2",
-        name: "Protein Pantry",
-        ownerId: "owner2",
-        collaborators: [{ uid: "user4" }],
-        ingredients: [
-          {
-            name: "Protein Powder",
-            category: "Supplements",
-            quantity: 1,
-            unitPrice: 20.0,
-            totalPrice: 20,
-            purchaseDate: new Date('2024-02-01'),
-            expDate: new Date('2025-02-01'),
-            imageSource: Images.protein,
-          }
-        ],
-        imageSource: Images.protein,
-      },
-      {
-        pantryId: "3",
-        name: "Grain Pantry",
-        ownerId: "owner3",
-        collaborators: [{ uid: "user4" }],
-        ingredients: [
-          {
-            name: "Wheat",
-            category: "Grains",
-            quantity: 1,
-            unitPrice: 20.0,
-            totalPrice: 20,
-            purchaseDate: new Date('2024-02-01'),
-            expDate: new Date('2025-02-01'),
-            imageSource: Images.grains,
-          },
-          {
-            name: "Barley",
-            category: "Grains",
-            quantity: 1,
-            unitPrice: 20.0,
-            totalPrice: 200000,
-            purchaseDate: new Date('2024-02-01'),
-            expDate: new Date('2025-02-01'),
-            imageSource: Images.grains,
-          },
-        ],
-        imageSource: Images.grains,
-      },
-    ]);
     // stuff for adding pantry via modal (i like this better than navigating to multiple pages where data can be lost in transfer)
     // State to control modal visibility
     const [modalVisible, setModalVisible] = useState(false);
@@ -163,16 +76,62 @@ const Pantries = () => {
       setCollaborators([]);
       setModalVisible(false);
     };
-  
+
+  //database connection (thanks rory)
+  // Get the list of pantries from the user's pantry array using uid, which is currently hardcoded as 333
+  const pantryListRetriever = async () => {
+    try {
+      // Send the get request to the database to get pantry ids
+      // Have to replace the constant UID with the user's actual ID eventually
+      const response = await axios.get(`${url}/users/${UID}/retrievePantries`, {
+        timeout: 10000,
+      });
+      const pantryIds = response.data;
+      console.log("Pantry IDs:", pantryIds);
+      
+      // Get the pantry names from the retrievePantryDetails function
+      const pantryDetails = await retrievePantryDetails(pantryIds);
+      console.log("Pantry Details:", pantryDetails);
+      
+      // Set the pantry state to the details we received, the ids and name
+      setPantries(pantryDetails);
+      console.log('Pantries retrieved');
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        const errorData = axiosError.response.data as ErrorResponse;
+        console.error('Error retrieving pantries.', errorData.message);
+      } else {
+        console.error('Error retrieving pantries.', axiosError.message);
+      }
+    }
+  };
+
+  // Get the name from each pantry using their pantryIds
+  const retrievePantryDetails = async (pantryIds: string[]): Promise<PantryDetails[]> => {
+    try {
+      const pantryRequests = pantryIds.map(async (pantryId) => {
+        const response = await axios.get(`${url}/pantries/${pantryId}`);
+        const { pantryId: id, name } = response.data;
+        return { pantryId: id, pantryName: name };
+      });
+      
+      return await Promise.all(pantryRequests);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        const errorData = axiosError.response.data as ErrorResponse;
+        console.error('Error retrieving individual pantry details.', errorData.message);
+      } else {
+        console.error('Error retrieving individual pantry details.', axiosError.message);
+      }
+      return [];
+    }
+  };
+
+
   return (
-    <View className="flex-1 justify-center items-center bg-custom-background">
-      {/*temporarily created modal for handling add pantry instead of pushing a route to a new page since i felt the functionality was cleaner and excessive with that 
-      <DarkButton 
-        onPress={() => router.push("./addpantry")} 
-        title={'Add Pantry'}
-        style={{ margin: 15 }}
-      />
-      */}
+    <View className="flex-1 justify-center items-center bg-custom-background">      
       <DarkButton 
         onPress={handleAddPantry} 
         title={'Add Pantry'}
@@ -240,12 +199,12 @@ const Pantries = () => {
       <Text></Text>
       {/** DYNAMICALLY POPULATE FOR A LIST OF JSON! */}
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 15}} className="bg-custom-background">
-      {pantryData.map((pantry) => (
+      {pantries.map((pantry) => (
         <View key={pantry.pantryId} className="mt-5">{/** tbh dont know why this key is mad here and not anywhere else*/}
           <PantryButton 
-            title={pantry.name!} 
+            title={pantry.pantryName!} 
             onPress={() => router.push("./individualpantry")} //want to push the individual pantry AND pantry data to the thing I think, but don't know how to logic that (unless default to nothing and then only populate when pantry clicked)
-            imageSource={pantry.imageSource} 
+            imageSource={Images.defaultPantry} 
           />
         </View>
       ))}
@@ -256,6 +215,8 @@ const Pantries = () => {
 
 export default Pantries;
 /**
+ * 
+ * 
  * Overview of pantries tab:
  * Main pantry tab
  *    Add pantry button at top of subsection layer
