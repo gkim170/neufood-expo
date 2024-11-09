@@ -8,7 +8,7 @@ import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
 import axios, { AxiosError } from 'axios';
 
-const UID = "333";
+const UID = "user-1729689547676"; //for me aka long thor :)
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface ErrorResponse {
@@ -22,7 +22,6 @@ interface PantryDetails {
 
 const Pantries = () => {
     const [pantries, setPantries] = useState<PantryDetails[]>([]);
-    const [selectedPantryId, setSelectedPantryId] = useState<string | null>(null); // State to keep track of selected pantry, there can only be one and you have to pick one
 
     // Used to make sure we get here correctly (for testing), can see this log in the terminal
     useEffect(() => {
@@ -55,27 +54,72 @@ const Pantries = () => {
     };
 
     // Function to handle adding pantry (e.g., submitting the form) after the user inputs text. 
-    const submitPantry = () => {
-      //TODO: for connecting to DB, hit route then populate newPantry with that data
-      let i = pantryData.length + 1;
-      let getId = i.toString(); //we would get this id back from the POST route ideally
-      //const imageKey = category.toLowerCase(); // Matches image keys to the correct image in order to use it
-      //TODO: enforce some sort of requirement/security check for this
+    // Function to handle creating a new pantry
+  const createPantry = async (pantryName: string, UID: string) => {
+    try {
+      // Create a new pantry object
       const newPantry = {
-        pantryId: getId,
         name: pantryName,
-        ownerId: 'ownerId',
-        collaborators: collaborators.map(uid => ({ uid})),
-        imageSource: Images.defaultPantry, //.imageKey
+        ownerId: UID, // Replace with actual ownerId from session or user context eventually
+      };
+
+      // Post the new pantry data to the backend API
+      const pantryResponse = await axios.post(`${url}/pantries/`, newPantry);
+      const retrievedPantry = pantryResponse.data;
+
+      return retrievedPantry; // Return the pantry data for further use
+    } catch (error) {
+      console.error("Error during pantry creation:", error);
+      throw new Error('There was an error creating the pantry. Please try again.');
+    }
+  };
+
+  // Function to handle adding collaborators to the pantry
+  const addCollaborators = async (pantryId: any, collaborators: any[]) => {
+    try {
+      if (collaborators && collaborators.length > 0) {
+        const collaboratorPayload = { collaborators: collaborators.map(collaborator => ({ uid: collaborator })) };
+
+        // Send request to add collaborators to the pantry
+        const collaboratorResponse = await axios.put(
+          `${url}/pantries/${pantryId}/addCollaborators`,
+          collaboratorPayload
+        );
       }
-      //make sure to post to DB first
-      console.log("Adding pantry:", pantryName, collaborators);
-      setPantryData([...pantryData, newPantry]);
-      // Clear input and close modal
+    } catch (error) {
+      console.error("Error during adding collaborators:", error);
+      throw new Error('There was an error adding collaborators. Please try again.');
+    }
+  };
+
+  // Function to handle submitting the pantry (e.g., submitting the form)
+  const submitPantry = async () => {
+    try {
+      // Step 1: Create the new pantry
+      const retrievedPantry = await createPantry(pantryName, UID);
+
+      // Step 2: Add collaborators to the pantry if they exist
+      if (retrievedPantry) {
+        await addCollaborators(retrievedPantry.pantryId, collaborators);
+      }
+
+      // Step 3: Call to repopulate pantry list based on UID
+      await pantryListRetriever();
+
+      // Step 4: Clear input and close modal
       setPantryName('');
       setCollaborators([]);
       setModalVisible(false);
-    };
+
+    } catch (error) {
+      console.error("Error during pantry submission:", error);
+      alert('There was an error creating the pantry or adding collaborators. Please try again.');
+      //Clear input and close modal
+      setPantryName('');
+      setCollaborators([]);
+      setModalVisible(false);
+    }
+  };
 
   //database connection (thanks rory)
   // Get the list of pantries from the user's pantry array using uid, which is currently hardcoded as 333
@@ -83,15 +127,11 @@ const Pantries = () => {
     try {
       // Send the get request to the database to get pantry ids
       // Have to replace the constant UID with the user's actual ID eventually
-      const response = await axios.get(`${url}/users/${UID}/retrievePantries`, {
-        timeout: 10000,
-      });
+      const response = await axios.get(`${url}/users/${UID}/retrievePantries`);
       const pantryIds = response.data;
-      console.log("Pantry IDs:", pantryIds);
       
       // Get the pantry names from the retrievePantryDetails function
       const pantryDetails = await retrievePantryDetails(pantryIds);
-      console.log("Pantry Details:", pantryDetails);
       
       // Set the pantry state to the details we received, the ids and name
       setPantries(pantryDetails);
