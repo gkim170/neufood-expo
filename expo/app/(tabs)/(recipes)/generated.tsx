@@ -3,6 +3,7 @@ import { FlatList, TouchableOpacity, View, Image, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FavoriteButton from '@/components/FavoriteButton';
+import RecipeCard from './recipeCard';
 
 const Generated = () => {
   const router = useRouter();
@@ -59,14 +60,7 @@ const Generated = () => {
         keyExtractor={(recipe) => recipe.uri}  // Use recipe URI as the unique key
         renderItem={({ item: recipe }) => (
           <TouchableOpacity onPress={() => console.log("Recipe Clicked: ", recipe.label)}>
-            {/* Going to make this its own component but keeping it here for now while I test */}
-            <View className="bg-primary-green rounded-lg mb-8 p-2">
-              <Image source={{ uri: recipe.images.REGULAR.url }} className="w-full h-40 rounded" />
-              <View className="flex-row justify-between items-center px-2">
-                <Text className="text-lg font-bold mt-2">{recipe.label}</Text>
-                <FavoriteButton />
-              </View>
-            </View>
+            <RecipeCard recipe={recipe} />
           </TouchableOpacity>
         )}
       />
