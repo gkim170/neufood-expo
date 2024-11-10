@@ -45,11 +45,20 @@ const Generated = () => {
     return (
       <View className="flex-1 justify-center items-center bg-custom-background px-8">
         <Text className="text-lg font-bold mt-2">
-          No recipes found
+          Recipes not found
         </Text>
       </View>
     );
   }
+
+  const handleRecipePress = (recipe) => {
+    router.push({
+      pathname: `/${recipe.uri.split('#')[1]}`,  // Use end of uri as the id
+      params: {
+        recipeUri: recipe.uri,  // Pass the entire recipe object
+      }
+    });
+  };
 
   // Render the list of recipes once they're successfully fetched
   return (
@@ -59,7 +68,7 @@ const Generated = () => {
         data={recipes}
         keyExtractor={(recipe) => recipe.uri}  // Use recipe URI as the unique key
         renderItem={({ item: recipe }) => (
-          <TouchableOpacity onPress={() => console.log("Recipe Clicked: ", recipe.label)}>
+          <TouchableOpacity onPress={() => handleRecipePress(recipe)}>
             <RecipeCard recipe={recipe} />
           </TouchableOpacity>
         )}
