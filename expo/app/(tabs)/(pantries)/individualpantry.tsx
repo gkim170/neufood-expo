@@ -9,7 +9,8 @@ import axios, { AxiosError } from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 
 const UID = "user-1729689547676"; //for me aka long thor :)
-const url = process.env.EXPO_PUBLIC_API_URL;
+const url = process.env.EXPO_PUBLIC_API_URL_HOME;
+//const url = process.env.EXPO_PUBLIC_API_URL_LEHIGH;
 
 interface ErrorResponse {
   message: string;
@@ -140,7 +141,14 @@ const IndividualPantry = () => {
 
   // Function to handle adding ingredient (e.g., submitting the form)
   const submitIngredient = async () => {
-    //TODO: NEED TO ENFORCE SOME SORT OF FORMATTING CHECK TO THE DATA
+    //make sure that expiration date is in the correct format
+
+    const isValidDate = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(expirationDate);
+
+    if (!isValidDate) {
+      alert('Invalid date format. Please use YYYY-MM-DD.');
+      return;
+    }
     const newIngredient = {
       name: ingredientName,
       totalPrice: Number(totalPrice),
@@ -173,23 +181,51 @@ const IndividualPantry = () => {
   const handleAddIngredient = () => {
     setModalVisible(true);
   };
+/**
+ * 
+ * @param ingredient 
+ * // DELETE route to delete ingredient(s) from a pantry
+//      takes in array of ingredient names (ex. ingredientNames = ["9999", "Cashew"]; )
+router.delete('/:pantryId/deleteIngredients', async (req, res) => {
+    try {
+/*
+curl -X DELETE -H "Content-Type: application/json" -d '{
+    "ingredientNames": ["9999", "Cashew"]
+}' http://localhost:8080/pantries/4/deleteIngredients
+*/
+const handleUse = async (ingredient: Ingredient) => {
+  // If quantity is zero or less, delete the ingredient from the pantry
+  if (ingredient.quantity <= 0) {
+      try {
+          console.log("Deleting ingredient:", ingredient.name);
+          await axios.delete(
+              `${url}/pantries/${selectedPantryId}/deleteIngredients`, 
+              { data: { ingredientNames: [ingredient.name] } }
+          );
+          console.log("Ingredient deleted successfully.");
+          pantryListRetriever(); // Refresh pantry list
+          return; // Exit function to prevent further modification
+      } catch (error) {
+          console.error("Error deleting ingredient:", error);
+          return; // Exit function to avoid modification attempt
+      }
+  }
 
-  const handleUse = async (ingredient: Ingredient) => {
-    if(ingredient.quantity < 0) return;//so we don't go below 0
-    const modifiedIngredient = { ...ingredient, quantity: ingredient.quantity - 1 };
-    
-    try{
+  // If quantity is greater than zero, decrement it
+  const modifiedIngredient = { ...ingredient, quantity: ingredient.quantity - 1 };
+  
+  try {
       await axios.put(
-        `${url}/pantries/${selectedPantryId}/modifyIngredient`, // Make sure the URL is correct
-        { modifiedIngredient }
+          `${url}/pantries/${selectedPantryId}/modifyIngredient`,
+          {data: { modifiedIngredient } }
       );
-
-      console.log("Ingredient used successfully");
+      console.log("Ingredient quantity decremented successfully.");
       pantryListRetriever();
-    }catch(error){
-      console.error('Error updating ingredient:', error);
-    }
-  };
+  } catch (error) {
+      console.error("Error updating ingredient:", error);
+  }
+};
+
   // removes previously added words if the thing is bad and you change your mind
   const handleCancelAdd = () => {
     setModalVisible(false);

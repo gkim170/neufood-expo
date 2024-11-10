@@ -8,7 +8,8 @@ import { Colors } from '@/constants/Colors';
 import axios, { AxiosError } from 'axios';
 
 const UID = "user-1729689547676"; //for me aka long thor :)
-const url = process.env.EXPO_PUBLIC_API_URL;
+const url = process.env.EXPO_PUBLIC_API_URL_HOME;
+//const url = process.env.EXPO_PUBLIC_API_URL_LEHIGH;
 
 interface ErrorResponse {
   message: string;
