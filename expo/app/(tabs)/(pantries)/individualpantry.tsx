@@ -7,7 +7,6 @@ import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
 import axios, { AxiosError } from 'axios';
 import { useLocalSearchParams } from 'expo-router';
-import images from '@/constants/images';
 
 const UID = "user-1729689547676"; //for me aka long thor :)
 const url = process.env.EXPO_PUBLIC_API_URL;
@@ -78,20 +77,6 @@ const IndividualPantry = () => {
   const ingredients = (selectedPantry?.ingredients ?? []) as Ingredient[];
   const { pantryId } = useLocalSearchParams();
 
-  // Handler for adding ingredients, toggles modal visibility
-  const handleAddIngredient = () => {
-    setModalVisible(true);
-  };
-  // removes previously added words if the thing is bad and you change your mind
-  const handleCancelAdd = () => {
-    setModalVisible(false);
-    setIngredientName('');
-    setTotalPrice('');
-    setCategory('');
-    setExpirationDate('');
-    setQuantity('');
-  };
-
   // Used to make sure we get here correctly (for testing, as well as initializes the pantry data), can see this log in the terminal
   useEffect(() => {
     console.log('Individual pantry page rendered');
@@ -155,14 +140,13 @@ const IndividualPantry = () => {
 
   // Function to handle adding ingredient (e.g., submitting the form)
   const submitIngredient = async () => {
-    const imageKey = category.toLowerCase() as ImageKeys;
+    //TODO: NEED TO ENFORCE SOME SORT OF FORMATTING CHECK TO THE DATA
     const newIngredient = {
       name: ingredientName,
       totalPrice: Number(totalPrice),
       category,
       expirationDate,
       quantity: Number(quantity),
-      image: Images[imageKey] || Images.other, // Use category-matched image or default
     };
   
     console.log("Adding ingredient:", newIngredient);
@@ -183,6 +167,37 @@ const IndividualPantry = () => {
       console.error("Error adding ingredient:", error);
       alert('There was an error adding the ingredient. Please try again.');
     }
+  };
+
+  // Handler for adding ingredients, toggles modal visibility
+  const handleAddIngredient = () => {
+    setModalVisible(true);
+  };
+
+  const handleUse = async (ingredient: Ingredient) => {
+    if(ingredient.quantity < 0) return;//so we don't go below 0
+    const modifiedIngredient = { ...ingredient, quantity: ingredient.quantity - 1 };
+    
+    try{
+      await axios.put(
+        `${url}/pantries/${selectedPantryId}/modifyIngredient`, // Make sure the URL is correct
+        { modifiedIngredient }
+      );
+
+      console.log("Ingredient used successfully");
+      pantryListRetriever();
+    }catch(error){
+      console.error('Error updating ingredient:', error);
+    }
+  };
+  // removes previously added words if the thing is bad and you change your mind
+  const handleCancelAdd = () => {
+    setModalVisible(false);
+    setIngredientName('');
+    setTotalPrice('');
+    setCategory('');
+    setExpirationDate('');
+    setQuantity('');
   };
 
   return (
@@ -316,7 +331,7 @@ const IndividualPantry = () => {
               </TouchableOpacity>
 
               {/* Close Button (and reset the fields)*/}
-              <TouchableOpacity onPress={() => handleCancelAdd()} style={{ marginTop: 10, alignItems: 'center' }}>
+              <TouchableOpacity onPress={handleCancelAdd} style={{ marginTop: 10, alignItems: 'center' }}>
                 <Text style={{ color: 'grey' }}>Cancel</Text>
               </TouchableOpacity>
             </View>
@@ -379,7 +394,7 @@ const IndividualPantry = () => {
                   </Text>
                   {/* Pill-shaped button for Use */}
                   <TouchableOpacity
-                    onPress={() => console.log("Using ingredient")} // Should decrement the counter and push to thing
+                    onPress={() => {handleUse(item)}} // Should decrement the counter and push to thing
                     style={{
                       backgroundColor: '#FFF', // Change to your desired color
                       borderRadius: 20, // Pill shape
