@@ -6,10 +6,10 @@ const RecipeCard = ({ recipe }) => {
 	return (
 	// Display the basic recipe info
 	<View className="bg-primary-green rounded-lg mb-8 p-2">
-		<Image source={recipe.image} className="w-full h-40 rounded" />
+		<Image source={{ uri: recipe.images.REGULAR.url }} className="w-full h-40 rounded" />
 		<View className="flex-row justify-between items-center px-2">
 			<Text className="text-lg font-bold mt-2">{recipe.label}</Text>
-			<FavoriteButton/>
+			<FavoriteButton />
 		</View>
 	</View>
 	);
