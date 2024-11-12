@@ -39,6 +39,7 @@ interface PantryDetails {
   pantryId: string; // The unique ID for the pantry
   name: string; // The name of the pantry
   ownerId: string; // The owner ID of the pantry
+  imageSource?: string; //image source of the pantry
   collaborators: Collaborator[]; // List of collaborators
   ingredients: Ingredient[]; // List of ingredients in the pantry
   __v: number; // MongoDB version key
@@ -206,7 +207,7 @@ const handleUse = async (ingredient: Ingredient) => {
   try {
       await axios.put(
           `${url}/pantries/${selectedPantryId}/modifyIngredient`,
-          {data: { modifiedIngredient } }
+          { modifiedIngredient }
       );
       console.log("Ingredient quantity decremented successfully.");
       pantryListRetriever();

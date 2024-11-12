@@ -28,7 +28,7 @@ const pantryimages = [
   { label: 'Office', value: 'Office' },
   { label: 'Office2', value: 'Office2' },
 ];
-type PantryKeys =  'protein' | 'dairy' | 'fruits' | 'vegetables' | 'grains' | 'protein' | 'oils' | 'condiments' | 'snacks' | 'desserts' | 'drinks' | 'spices' | 'spreads' | 'other';
+type PantryKeys =  'Apartment' | 'Dorm' | 'House' | 'Office' | 'Office2';
 
 const Pantries = () => {
     // stuff for adding pantry via modal (i like this better than navigating to multiple pages where data can be lost in transfer)
