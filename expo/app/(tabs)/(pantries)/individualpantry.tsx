@@ -181,18 +181,7 @@ const IndividualPantry = () => {
   const handleAddIngredient = () => {
     setModalVisible(true);
   };
-/**
- * 
- * @param ingredient 
- * // DELETE route to delete ingredient(s) from a pantry
-//      takes in array of ingredient names (ex. ingredientNames = ["9999", "Cashew"]; )
-router.delete('/:pantryId/deleteIngredients', async (req, res) => {
-    try {
-/*
-curl -X DELETE -H "Content-Type: application/json" -d '{
-    "ingredientNames": ["9999", "Cashew"]
-}' http://localhost:8080/pantries/4/deleteIngredients
-*/
+
 const handleUse = async (ingredient: Ingredient) => {
   // If quantity is zero or less, delete the ingredient from the pantry
   if (ingredient.quantity <= 0) {

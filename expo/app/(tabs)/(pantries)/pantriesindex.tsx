@@ -2,6 +2,7 @@ import { View, Text, Image, FlatList, Modal, TouchableOpacity, TextInput, Scroll
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import DarkButton from '@/components/DarkButton';
+import { Dropdown } from 'react-native-element-dropdown'
 import PantryButton from '@/components/PantryButton';
 import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
@@ -18,7 +19,16 @@ interface ErrorResponse {
 interface PantryDetails {
   pantryId: string;
   pantryName: string;
+  imageSource: string;
 }
+const pantryimages = [
+  { label: 'Apartment', value: 'Apartment' },
+  { label: 'Dorm', value: 'Dorm' },
+  { label: 'House', value: 'House' },
+  { label: 'Office', value: 'Office' },
+  { label: 'Office2', value: 'Office2' },
+];
+type PantryKeys =  'protein' | 'dairy' | 'fruits' | 'vegetables' | 'grains' | 'protein' | 'oils' | 'condiments' | 'snacks' | 'desserts' | 'drinks' | 'spices' | 'spreads' | 'other';
 
 const Pantries = () => {
     // stuff for adding pantry via modal (i like this better than navigating to multiple pages where data can be lost in transfer)
@@ -28,6 +38,8 @@ const Pantries = () => {
     const [collaboratorInput, setCollaboratorInput] = useState(''); // Temporary input for a single collaborator
     const [collaborators, setCollaborators] = useState<string[]>([]);
     const [pantries, setPantries] = useState<PantryDetails[]>([]);
+    const [pantryImagesOpen, setPantryImagesOpen] = useState(false);
+    const [pantryImage, setPantryImage] = useState('');
 
     // Used to make sure we get here correctly (for testing), can see this log in the terminal
     useEffect(() => {
@@ -50,18 +62,21 @@ const Pantries = () => {
     const handleCancelAdd = () => {
       setModalVisible(false);
       setPantryName('');
+      setPantryImage('');
       setCollaborators([]);
     };
 
     // Function to handle adding pantry (e.g., submitting the form) after the user inputs text. 
     // Function to handle creating a new pantry
-  const createPantry = async (pantryName: string, UID: string) => {
+  const createPantry = async (pantryName: string, UID: string, pantryImage: string) => {
     try {
       // Create a new pantry object
       const newPantry = {
         name: pantryName,
         ownerId: UID, // Replace with actual ownerId from session or user context eventually
+        imageSource: pantryImage, // OKAY
       };
+      console.log(newPantry);
 
       // Post the new pantry data to the backend API
       const pantryResponse = await axios.post(`${url}/pantries/`, newPantry);
@@ -96,7 +111,8 @@ const Pantries = () => {
   const submitPantry = async () => {
     try {
       // Step 1: Create the new pantry
-      const retrievedPantry = await createPantry(pantryName, UID);
+      console.log(pantryImage);
+      const retrievedPantry = await createPantry(pantryName, UID, pantryImage);
 
       // Step 2: Add collaborators to the pantry if they exist
       if (retrievedPantry) {
@@ -107,9 +123,7 @@ const Pantries = () => {
       await pantryListRetriever();
 
       // Step 4: Clear input and close modal
-      setPantryName('');
-      setCollaborators([]);
-      setModalVisible(false);
+      handleCancelAdd();
 
     } catch (error) {
       console.error("Error during pantry submission:", error);
@@ -152,8 +166,8 @@ const Pantries = () => {
     try {
       const pantryRequests = pantryIds.map(async (pantryId) => {
         const response = await axios.get(`${url}/pantries/${pantryId}`);
-        const { pantryId: id, name } = response.data;
-        return { pantryId: id, pantryName: name };
+        const { pantryId: id, name, imageSource } = response.data;
+        return { pantryId: id, pantryName: name, imageSource: imageSource };
       });
       
       return await Promise.all(pantryRequests);
@@ -201,6 +215,29 @@ const Pantries = () => {
                 }}
                 placeholderTextColor= "#000" // Set the placeholder text color
               />
+              <Dropdown
+                style={{
+                  borderRadius: 8,
+                  padding: 8,
+                  marginTop: 10,
+                  borderWidth: 1,
+                  borderColor: '#000',
+                }}
+                placeholderStyle={{ color: '#000', fontSize: 14 }}
+                selectedTextStyle={{ color: '#000', fontSize: 14 }}
+                data={pantryimages}
+                labelField="label"
+                valueField="value"
+                placeholder="Location"
+                value={pantryImage}
+                onFocus={() => setPantryImagesOpen(true)}
+                onBlur={() => setPantryImagesOpen(false)}
+                onChange={item => {
+                  setPantryImage(item.value);
+                  setPantryImagesOpen(false);
+                }}
+                maxHeight={200} // Set a maximum height if you have many items
+              />
               {/** input and add collaborators*/}
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                 <TextInput
@@ -239,15 +276,20 @@ const Pantries = () => {
       <Text></Text>
       {/** DYNAMICALLY POPULATE FOR A LIST OF JSON! */}
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 15}} className="bg-custom-background">
-      {pantries.map((pantry) => (
-        <View key={pantry.pantryId} className="mt-5">{/** tbh dont know why this key is mad here and not anywhere else*/}
-          <PantryButton 
-            title={pantry.pantryName!} 
-            onPress={() => router.push(`./individualpantry?pantryId=${pantry.pantryId}`)} //want to push the pantry id that we just clicked because we want the default view to be the ingredients from that pantry
-            imageSource={Images.defaultPantry} 
-          />
-        </View>
-      ))}
+      {pantries.map((pantry) => {
+        // Ensure pantryKey matches a valid key in the Images object
+        const pantryKey = pantry.imageSource?.toLowerCase() as PantryKeys; // Assume pantry.category holds the category
+
+        return (
+          <View key={pantry.pantryId} className="mt-5">
+            <PantryButton 
+              title={pantry.pantryName!} 
+              onPress={() => router.push(`./individualpantry?pantryId=${pantry.pantryId}`)}
+              imageSource={Images[pantryKey] || Images.other} // Fix syntax issue here
+            />
+          </View>
+        );
+      })}
     </ScrollView>
     </View>
   );
