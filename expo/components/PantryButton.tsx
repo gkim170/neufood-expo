@@ -10,7 +10,7 @@ import { Colors } from '@/constants/Colors';
 interface PantryButtonProps {
   onPress: () => void;
   title: string;
-  imageSource: ImageSourcePropType; // Add a prop for the image source
+  imageSource?: ImageSourcePropType; // Add a prop for the image source
   textStyles?: object;
   containerStyles?: object;
 }

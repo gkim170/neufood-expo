@@ -5,149 +5,227 @@ import DarkButton from '@/components/DarkButton';
 import BackArrow from '@/components/BackArrow';
 import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
+import axios, { AxiosError } from 'axios';
+import { useLocalSearchParams } from 'expo-router';
+
+const UID = "user-1729689547676"; //for me aka long thor :)
+const url = process.env.EXPO_PUBLIC_API_URL_HOME;
+//const url = process.env.EXPO_PUBLIC_API_URL_LEHIGH;
+
+interface ErrorResponse {
+  message: string;
+}
+
+interface Ingredient {
+  name: string;
+  category: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  purchaseDate: string; // ISO string for the purchase date
+  expDate: string; // ISO string for the expiration date
+  _id: string;
+  __v: number;
+}
+
+interface Collaborator {
+  // Define the structure of a collaborator if needed
+  // Example: { userId: string, userName: string }
+  [key: string]: any;
+}
+
+interface PantryDetails {
+  _id: string; // MongoDB unique ID for the pantry
+  pantryId: string; // The unique ID for the pantry
+  name: string; // The name of the pantry
+  ownerId: string; // The owner ID of the pantry
+  collaborators: Collaborator[]; // List of collaborators
+  ingredients: Ingredient[]; // List of ingredients in the pantry
+  __v: number; // MongoDB version key
+}
+
+const categories = [
+  { label: 'Dairy', value: 'Dairy' },
+  { label: 'Fruits', value: 'Fruits' },
+  { label: 'Vegetables', value: 'Vegetables' },
+  { label: 'Grains', value: 'Grains' },
+  { label: 'Protein', value: 'Protein' },
+  { label: 'Oils', value: 'Oils' },
+  { label: 'Condiments', value: 'Condiments' },
+  { label: 'Snacks', value: 'Snacks' },
+  { label: 'Desserts', value: 'Desserts' },
+  { label: 'Drinks', value: 'Drinks' },
+  { label: 'Spices', value: 'Spices' },
+  { label: 'Spreads', value: 'Spreads' },
+  { label: 'Other', value: 'Other' },
+];
+
+type ImageKeys =  'protein' | 'dairy' | 'fruits' | 'vegetables' | 'grains' | 'protein' | 'oils' | 'condiments' | 'snacks' | 'desserts' | 'drinks' | 'spices' | 'spreads' | 'other';
 
 const IndividualPantry = () => {
-    // State to control modal visibility within handlers
-    const [selectedPantryId, setSelectedPantryId] = useState("1"); // Set default selected pantry
-    const [modalVisible, setModalVisible] = useState(false);
-    const [ingredientName, setIngredientName] = useState('');
-    const [totalPrice, setTotalPrice] = useState('');
-    const [category, setCategory] = useState('');
-    const [categoryOpen, setCategoryOpen] = useState(false);
-    const [expirationDate, setExpirationDate] = useState('');
-    const [quantity, setQuantity] = useState('');
+  // State to control modal visibility and other components within handlers
+  const [pantries, setPantries] = useState<PantryDetails[]>([]);
+  const [selectedPantryId, setSelectedPantryId] = useState<string | undefined>(undefined); // Set default selected pantry to be NONE
+  const [modalVisible, setModalVisible] = useState(false);
+  const [ingredientName, setIngredientName] = useState('');
+  const [totalPrice, setTotalPrice] = useState('');
+  const [category, setCategory] = useState('');
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [expirationDate, setExpirationDate] = useState('');
+  const [quantity, setQuantity] = useState('');
 
-  //test data constructors to make sure we're pushing the correct types to the array according to mongoose
-  type Collaborator = {
-    uid?: string;
-  };
-  
-  type Ingredient = {
-    name?: string;
-    category?: string;
-    quantity?: number;
-    unitPrice?: number;
-    totalPrice?: number;
-    purchaseDate?: Date;
-    expDate?: Date;
-    imageSource?: any; //THIS CURRENTLY ISN'T OUR DB SOLUTION AND WE NEED TO CHANGE THIS
-  };
-  
-  type Pantry = {
-    pantryId?: string;
-    name?: string;
-    ownerId?: string;
-    collaborators?: Collaborator[];
-    ingredients?: Ingredient[];
-    imageSource?: any;
-  };
-  
-  // Test data for pantries
-  const [pantryData, setPantryData] = useState<Pantry[]>([
-    {
-      pantryId: "1",
-      name: "Pantry 1",
-      ownerId: "owner1",
-      collaborators: [{ uid: "user2" }, { uid: "user3" }],
-      ingredients: [
-        {
-          name: "Apples",
-          category: "Fruit",
-          quantity: 100,
-          unitPrice: 0.5,
-          totalPrice: 5,
-          purchaseDate: new Date('2024-01-01'),
-          expDate: new Date('2024-01-10'),
-          imageSource: Images.fruits,
-        },
-        {
-          name: "Chicken Breast",
-          category: "Meat",
-          quantity: 522,
-          unitPrice: 2.0,
-          totalPrice: 10,
-          purchaseDate: new Date('2024-01-01'),
-          expDate: new Date('2024-01-05'),
-          imageSource: Images.protein,
-        }
-      ],
-      imageSource: Images.defaultPantry,
-    },
-    {
-      pantryId: "2",
-      name: "Protein Pantry",
-      ownerId: "owner2",
-      collaborators: [{ uid: "user4" }],
-      ingredients: [
-        {
-          name: "Protein Powder",
-          category: "Supplements",
-          quantity: 12,
-          unitPrice: 20.0,
-          totalPrice: 20,
-          purchaseDate: new Date('2024-02-01'),
-          expDate: new Date('2025-02-01'),
-          imageSource: Images.spices,
-        }
-      ],
-      imageSource: Images.protein,
-    },
-    {
-      pantryId: "3",
-      name: "Grain Pantry",
-      ownerId: "owner3",
-      collaborators: [{ uid: "user4" }],
-      ingredients: [
-        {
-          name: "Wheat",
-          category: "Grains",
-          quantity: 1123,
-          unitPrice: 20.0,
-          totalPrice: 20,
-          purchaseDate: new Date('2024-02-01'),
-          expDate: new Date('2025-02-01'),
-          imageSource: Images.grains,
-        },
-        {
-          name: "Barley",
-          category: "Grains",
-          quantity: 122211,
-          unitPrice: 20.0,
-          totalPrice: 200000,
-          purchaseDate: new Date('2024-02-01'),
-          expDate: new Date('2025-02-01'),
-          imageSource: Images.grains,
-        },
-      ],
-      imageSource: Images.grains,
-    },
-  ]);
-
-  const categories = [
-    { label: 'Dairy', value: 'Dairy' },
-    { label: 'Fruits', value: 'Fruits' },
-    { label: 'Vegetables', value: 'Vegetables' },
-    { label: 'Grains', value: 'Grains' },
-    { label: 'Protein', value: 'Protein' },
-    { label: 'Oils', value: 'Oils' },
-    { label: 'Condiments', value: 'Condiments' },
-    { label: 'Snacks', value: 'Snacks' },
-    { label: 'Desserts', value: 'Desserts' },
-    { label: 'Drinks', value: 'Drinks' },
-    { label: 'Spices', value: 'Spices' },
-    { label: 'Spreads', value: 'Spreads' },
-    { label: 'Other', value: 'Other' },
-  ];
-
-  type ImageKeys =  'protein' | 'dairy' | 'fruits' | 'vegetables' | 'grains' | 'protein' | 'oils' | 'condiments' | 'snacks' | 'desserts' | 'drinks' | 'spices' | 'spreads' | 'other';
-
-  const selectedPantry = pantryData.find((pantry) => pantry.pantryId === selectedPantryId);
+  const selectedPantry = pantries.find((pantry) => pantry.pantryId === selectedPantryId);
   const ingredients = (selectedPantry?.ingredients ?? []) as Ingredient[];
+  const { pantryId } = useLocalSearchParams();
+
+  // Used to make sure we get here correctly (for testing, as well as initializes the pantry data), can see this log in the terminal
+  useEffect(() => {
+    console.log('Individual pantry page rendered');
+    pantryListRetriever();
+  }, []);
+
+  useEffect(() => {
+    // Ensure pantryId is a string (handle case where it might be an array of strings)
+    if (Array.isArray(pantryId)) {
+      setSelectedPantryId(pantryId[0]); // Use the first element if pantryId is an array
+    } else if (typeof pantryId === 'string') {
+      setSelectedPantryId(pantryId); // Set the pantryId if it's a single string
+    }
+  }, [pantryId]); // Run when pantryId changes
+
+  //gets the list of pantries from the uid
+  const pantryListRetriever = async () => {
+    try {
+      // Send the get request to the database to get pantry ids
+      // Have to replace the constant UID with the user's actual ID eventually
+      const response = await axios.get(`${url}/users/${UID}/retrievePantries`);
+      const pantryIds = response.data;
+      
+      // Get the pantry names from the retrievePantryDetails function
+      const pantryDetails = await retrievePantryDetails(pantryIds);
+      
+      // Set the pantry state to the details we received, the ids and name and all other things!
+      setPantries(pantryDetails);
+      console.log('Pantries retrieved', pantryDetails);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        const errorData = axiosError.response.data as ErrorResponse;
+        console.error('Error retrieving pantries.', errorData.message);
+      } else {
+        console.error('Error retrieving pantries.', axiosError.message);
+      }
+    }
+  };
+
+  // Get the name from each pantry using their pantryIds
+  const retrievePantryDetails = async (pantryIds: string[]): Promise<PantryDetails[]> => {
+    try {
+      const pantryRequests = pantryIds.map(async (pantryId) => {
+        const response = await axios.get(`${url}/pantries/${pantryId}`);
+        return response.data;
+      });
+      
+      return await Promise.all(pantryRequests);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        const errorData = axiosError.response.data as ErrorResponse;
+        console.error('Error retrieving individual pantry details.', errorData.message);
+      } else {
+        console.error('Error retrieving individual pantry details.', axiosError.message);
+      }
+      return [];
+    }
+  };
+
+  // Function to handle adding ingredient (e.g., submitting the form)
+  const submitIngredient = async () => {
+    //make sure that expiration date is in the correct format
+
+    const isValidDate = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(expirationDate);
+
+    if (!isValidDate) {
+      alert('Invalid date format. Please use YYYY-MM-DD.');
+      return;
+    }
+    const newIngredient = {
+      name: ingredientName,
+      totalPrice: Number(totalPrice),
+      category,
+      expirationDate,
+      quantity: Number(quantity),
+    };
+  
+    console.log("Adding ingredient:", newIngredient);
+  
+    // Make the PUT request to the backend
+    try {
+      const response = await axios.put(
+        `${url}/pantries/${selectedPantryId}/addIngredients`, // Make sure the URL is correct
+        { ingredients: [newIngredient] }
+      );
+      
+      console.log("Ingredients added to pantry:", response.data);
+  
+      // Call pantrylistretriever again to show the updated ingredient stuff
+      pantryListRetriever();
+      handleCancelAdd(); // Close the form/modal and wipe the states
+    } catch (error) {
+      console.error("Error adding ingredient:", error);
+      alert('There was an error adding the ingredient. Please try again.');
+    }
+  };
 
   // Handler for adding ingredients, toggles modal visibility
   const handleAddIngredient = () => {
     setModalVisible(true);
   };
+/**
+ * 
+ * @param ingredient 
+ * // DELETE route to delete ingredient(s) from a pantry
+//      takes in array of ingredient names (ex. ingredientNames = ["9999", "Cashew"]; )
+router.delete('/:pantryId/deleteIngredients', async (req, res) => {
+    try {
+/*
+curl -X DELETE -H "Content-Type: application/json" -d '{
+    "ingredientNames": ["9999", "Cashew"]
+}' http://localhost:8080/pantries/4/deleteIngredients
+*/
+const handleUse = async (ingredient: Ingredient) => {
+  // If quantity is zero or less, delete the ingredient from the pantry
+  if (ingredient.quantity <= 0) {
+      try {
+          console.log("Deleting ingredient:", ingredient.name);
+          await axios.delete(
+              `${url}/pantries/${selectedPantryId}/deleteIngredients`, 
+              { data: { ingredientNames: [ingredient.name] } }
+          );
+          console.log("Ingredient deleted successfully.");
+          pantryListRetriever(); // Refresh pantry list
+          return; // Exit function to prevent further modification
+      } catch (error) {
+          console.error("Error deleting ingredient:", error);
+          return; // Exit function to avoid modification attempt
+      }
+  }
+
+  // If quantity is greater than zero, decrement it
+  const modifiedIngredient = { ...ingredient, quantity: ingredient.quantity - 1 };
+  
+  try {
+      await axios.put(
+          `${url}/pantries/${selectedPantryId}/modifyIngredient`,
+          {data: { modifiedIngredient } }
+      );
+      console.log("Ingredient quantity decremented successfully.");
+      pantryListRetriever();
+  } catch (error) {
+      console.error("Error updating ingredient:", error);
+  }
+};
+
   // removes previously added words if the thing is bad and you change your mind
   const handleCancelAdd = () => {
     setModalVisible(false);
@@ -158,68 +236,40 @@ const IndividualPantry = () => {
     setQuantity('');
   };
 
-  // Function to handle adding ingredient (e.g., submitting the form)
-  const submitIngredient = () => {
-    const imageKey = category.toLowerCase() as ImageKeys;
-    const newIngredient = {
-      name: ingredientName,
-      totalPrice: Number(totalPrice),
-      category,
-      expirationDate,
-      quantity: Number(quantity),
-      image: Images[imageKey] || Images.other, // Use category-matched image or default
-    };
-    //TODO: MAKE THIS HIT THE ROUTE actually!
-    console.log("Adding ingredient:", ingredientName, totalPrice, category, expirationDate, quantity);
-    const updatedPantryData = pantryData.map((pantry) => 
-      pantry.pantryId === selectedPantryId
-        ? { ...pantry, ingredients: [...(pantry.ingredients) || [], newIngredient] }
-        : pantry
-    );
-    setPantryData(updatedPantryData);
-
-    handleCancelAdd();
-  };
-
-  // Used to make sure we get here correctly (for testing), can see this log in the terminal
-  useEffect(() => {
-    console.log('Individual pantry page rendered');
-  }, []);
-
   return (
     <View className="flex-1 bg-custom-background p-4">
       <BackArrow />
       <View>
         {/** horizontal scrolling list of pantries populated by pantries data */}
-        <FlatList
-          style={{marginLeft: 50}}
-          horizontal
-          data={pantryData}
-          keyExtractor={(item: Pantry) => item.pantryId!}
-          showsHorizontalScrollIndicator={true}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => setSelectedPantryId(item.pantryId!)}
-              style={{
-                padding: 10,
-                backgroundColor: selectedPantry === item.pantryId ? Colors.darkGreen : Colors.primaryGreen,
-                marginRight: 10,
-                marginLeft: 5,
-                marginTop: 20,
-                borderRadius: 5,
-                height: 50,
-                minWidth: 150,
-                alignItems: 'center',
-                flex: 1,
-              }}
-            >
-              <Text style={{ justifyContent: 'center', fontSize: 20, color: selectedPantry === item.pantryId ? '#FFF' : '#000' }}>
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          )}
-          contentContainerStyle={{ paddingBottom: 10 }} // Optional: Add padding at the bottom
-        />
+        <FlatList<PantryDetails>
+        style={{ marginLeft: 50 }}
+        horizontal
+        data={pantries}
+        keyExtractor={(item: PantryDetails) => item.pantryId!}
+        showsHorizontalScrollIndicator={true}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => setSelectedPantryId(item.pantryId!)}
+            style={{
+              padding: 10,
+              backgroundColor: selectedPantryId === item.pantryId ? Colors.darkGreen : Colors.primaryGreen,
+              marginRight: 10,
+              marginLeft: 5,
+              marginTop: 20,
+              borderRadius: 5,
+              height: 50,
+              minWidth: 150,
+              alignItems: 'center',
+              flex: 1,
+            }}
+          >
+            <Text style={{ justifyContent: 'center', fontSize: 20, color: selectedPantryId === item.pantryId ? '#FFF' : '#000' }}>
+              {item.name}
+            </Text>
+          </TouchableOpacity>
+        )}
+        contentContainerStyle={{ paddingBottom: 10 }}
+      />
         {/* Add Ingredient Button */}
         <DarkButton 
           style={{marginTop: 10, marginLeft: 50, justifyContent: 'center'}}
@@ -259,7 +309,6 @@ const IndividualPantry = () => {
                   marginBottom: 15,
                   borderWidth: 1, 
                 }}
-                keyboardType="numeric"
                 placeholderTextColor= "#000" // Set the placeholder text color
               />
               <Dropdown
@@ -287,10 +336,10 @@ const IndividualPantry = () => {
                 maxHeight={200} // Set a maximum height if you have many items
               />
               <TextInput
-                placeholder="Expiration Date"
+                placeholder="Expiration Date (Fmt: 2024-12-31)"
                 value={expirationDate}
                 onChangeText={setExpirationDate}
-                keyboardType="numeric"//need to make sure this formats as a date
+                
                 style={{ 
                   borderRadius: 8,
                   padding: 8,
@@ -303,7 +352,6 @@ const IndividualPantry = () => {
                 placeholder="Quantity"
                 value={quantity}
                 onChangeText={setQuantity}
-                keyboardType="numeric"
                 style={{ 
                   borderRadius: 8,
                   padding: 8,
@@ -319,7 +367,7 @@ const IndividualPantry = () => {
               </TouchableOpacity>
 
               {/* Close Button (and reset the fields)*/}
-              <TouchableOpacity onPress={() => handleCancelAdd()} style={{ marginTop: 10, alignItems: 'center' }}>
+              <TouchableOpacity onPress={handleCancelAdd} style={{ marginTop: 10, alignItems: 'center' }}>
                 <Text style={{ color: 'grey' }}>Cancel</Text>
               </TouchableOpacity>
             </View>
@@ -359,7 +407,12 @@ const IndividualPantry = () => {
             contentContainerStyle={{ alignItems: 'center', paddingBottom: 215 }}
             keyExtractor={(item, index) => index.toString()}
             numColumns={2} // Set to two columns
-            renderItem={({ item }) => (
+            renderItem={({ item }) => {
+              // Map category to image
+              const categoryKey = item.category.toLowerCase() as ImageKeys;
+              const imageSource = Images[categoryKey] || Images.other; // Fallback to 'other' if no match
+                
+              return(
               <TouchableOpacity
                 className="p-4 m-2 rounded-md shadow"
                 onPress={() => console.log("Ingredient clicked")}
@@ -367,7 +420,7 @@ const IndividualPantry = () => {
               >
                 {/* Dynamic image sourcing based on category */}
                 <Image 
-                  source={item.imageSource || Images.other} 
+                  source={imageSource || Images.other} 
                   className="w-12 h-12" 
                 />
                 <Text className="font-bold mt-2">{item.name}</Text>
@@ -377,7 +430,7 @@ const IndividualPantry = () => {
                   </Text>
                   {/* Pill-shaped button for Use */}
                   <TouchableOpacity
-                    onPress={() => console.log("Using ingredient")} // Should decrement the counter and push to thing
+                    onPress={() => {handleUse(item)}} // Should decrement the counter and push to thing
                     style={{
                       backgroundColor: '#FFF', // Change to your desired color
                       borderRadius: 20, // Pill shape
@@ -406,7 +459,7 @@ const IndividualPantry = () => {
                   />
                 </TouchableOpacity>
               </TouchableOpacity>
-            )}
+            )}}
           />
         </View>     
       )}
