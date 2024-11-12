@@ -5,10 +5,10 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo/logo-background.png",
-    "scheme": "myapp",
+    "scheme": "https",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/logo/logo-transparent.png",
+      "image": "./assets/images/logo/logo-transparent-padded.png",
       "resizeMode": "contain",
       "imageScaleMode": "scale",
       "backgroundColor": "#FAF6EB"
@@ -21,7 +21,7 @@
       "package": "com.neufoodies.neufood",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFFFFF"
       }
     },
     "web": {

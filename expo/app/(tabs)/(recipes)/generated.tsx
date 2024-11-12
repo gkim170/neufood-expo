@@ -1,23 +1,79 @@
-import { View, Text } from 'react-native'
-import React, { useEffect } from 'react'
-import { StatusBar } from 'expo-status-bar';
-import CustomButton from '../../../components/CustomButton';
-import { router } from 'expo-router';
-import BackArrow from '@/components/BackArrow';
+import React, { useEffect, useState } from 'react';
+import { FlatList, TouchableOpacity, View, Image, Text } from 'react-native';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import FavoriteButton from '@/components/FavoriteButton';
+import RecipeCard from './recipeCard';
 
 const Generated = () => {
-  // Used to make sure we get here correctly (for testing), can see this log in the terminal
-  useEffect(() => {
-    console.log('Generated recipes page rendered');
-  }, []);
+  const router = useRouter();
+  const [recipes, setRecipes] = useState([]);
+  const [error, setError] = useState(null);
 
+  // hard coded query and diet for now, we will eventually get these from the users profile preferences and add more such as health, cuisineType, mealType, and dishType
+  const query = "chicken%20wings%2C%20apple";
+  const diet = "balanced";
+
+  // Make sure EXPO_PUBLIC_EDAMAM_APP_ID and EXPO_PUBLIC_EDAMAM_APP_KEY are defined as strings in .env that's in the root of the project
+  const getRecipesSearchRequestURL = (query: string, diet: string) => {
+    const id = process.env.EXPO_PUBLIC_EDAMAM_APP_ID;
+    const key = process.env.EXPO_PUBLIC_EDAMAM_APP_KEY;
+    return `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${id}&app_key=${key}&diet=${diet}&imageSize=REGULAR&field=uri&field=label&field=image&field=images&field=source&field=url&field=ingredientLines&field=calories&field=totalTime`;
+  };
+
+   // useEffect hook to fetch recipes from the API
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const response = await fetch(getRecipesSearchRequestURL(query, diet)); // Make the API request using the constructed URL with query and diet parameters
+        const data = await response.json(); // Parse the JSON response from the API
+        console.log("Edamam API Response:", data); // Logging the response for development purposes
+        setRecipes(data.hits.map(hit => hit.recipe)); // If the request is successful, update the state with the fetched recipes
+      } catch (error) {
+        // If there is an error, log it for testing purposes
+        console.error("Error fetching response:", error);
+        setError(error);
+      }
+    };
+    // Call the fetch function when the query or diet changes
+    fetchRecipes();
+  }, [query, diet]);
+
+
+  // If there's an error, display a message on the page for the user
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center bg-custom-background px-8">
+        <Text className="text-lg font-bold mt-2">
+          Recipes not found
+        </Text>
+      </View>
+    );
+  }
+
+  const handleRecipePress = (recipe) => {
+    router.push({
+      pathname: `/${recipe.uri.split('#')[1]}`,  // Use end of uri as the id
+      params: {
+        recipeUri: recipe.uri,  // Pass the entire recipe object
+      }
+    });
+  };
+
+  // Render the list of recipes once they're successfully fetched
   return (
-    <View className="flex-1 justify-center items-center bg-custom-background">
-      <BackArrow/>
-      <Text className="font-bold text-2xl my-4">
-        Generated Recipes
-      </Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-custom-background px-8">
+      {/* Display the recipes in a FlatList */}
+      <FlatList
+        data={recipes}
+        keyExtractor={(recipe) => recipe.uri}  // Use recipe URI as the unique key
+        renderItem={({ item: recipe }) => (
+          <TouchableOpacity onPress={() => handleRecipePress(recipe)}>
+            <RecipeCard recipe={recipe} />
+          </TouchableOpacity>
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
