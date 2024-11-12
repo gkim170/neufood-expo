@@ -24,6 +24,12 @@ import spices from "@/assets/images/pantries/ingredients/spices.png";
 import spreads from "@/assets/images/pantries/ingredients/spreads.png";
 import vegetables from "@/assets/images/pantries/ingredients/vegetables.png";
 import profpic from "@/assets/images/profile/profilepic.png"
+import house from "@/assets/images/pantries/pantry_card_images/house.jpeg"
+import office from "@/assets/images/pantries/pantry_card_images/office.jpeg"
+import office2 from "@/assets/images/pantries/pantry_card_images/office2.jpeg"
+import apartment from "@/assets/images/pantries/pantry_card_images/apartment.jpeg"
+import dorm from "@/assets/images/pantries/pantry_card_images/dorm.jpeg"
+
 
 export default {
     logo,
@@ -50,4 +56,9 @@ export default {
     vegetables,
     infoIcon,
     profpic,
+    house,
+    office,
+    office2,
+    apartment,
+    dorm
 };
