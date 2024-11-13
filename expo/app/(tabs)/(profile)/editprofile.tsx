@@ -121,7 +121,7 @@ const editProfile = () => {
         {/* input for password */}
         <TextInput
           style={[styles.input, error && !lastname ? styles.errorInput : null]}
-          placeholder={user.passwd == '' ? "Password *" : user.passwd}
+          placeholder={user.passwd == '' ? "Password *" : '*'.repeat(user.passwd.length)}
           placeholderTextColor="#888"
           value={passwd}
           onChangeText={setPasswd}
