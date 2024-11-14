@@ -9,8 +9,7 @@ import axios, { AxiosError } from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 
 const UID = "user-1729689547676"; //for me aka long thor :)
-//const url = process.env.EXPO_PUBLIC_API_URL_HOME;
-const url = process.env.EXPO_PUBLIC_API_URL_LEHIGH;
+const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface ErrorResponse {
   message: string;

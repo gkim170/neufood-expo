@@ -1,4 +1,4 @@
-import { View, Text, Image, FlatList, Modal, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, Image, Modal, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import DarkButton from '@/components/DarkButton';
@@ -9,8 +9,7 @@ import { Colors } from '@/constants/Colors';
 import axios, { AxiosError } from 'axios';
 
 const UID = "user-1729689547676"; //for me aka long thor :)
-//const url = process.env.EXPO_PUBLIC_API_URL_HOME;
-const url = process.env.EXPO_PUBLIC_API_URL_LEHIGH;
+const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface ErrorResponse {
   message: string;
