@@ -6,6 +6,7 @@ import SignInButton from '@/components/DarkButton';
 import GoogleButton from '@/components/GoogleButton';
 import axios, { AxiosError } from 'axios';
 import WelcomeModal from '@/components/WelcomeModal'; // Import the custom modal
+import { useAuth } from '@/components/AuthContext'; // Import AuthContext
 
 const url = process.env.EXPO_PUBLIC_API_URL;
 
@@ -20,11 +21,12 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const { setAuthState } = useAuth(); // Use the AuthContext
   const [userName, setUserName] = useState('');
 
   const handleSignUp = async () => {
     const name = `${firstName} ${lastName}`;
-  
+
     try {
       // Make a POST request to the backend server
       const response = await axios.post(`${url}/auth/register`, {
@@ -33,22 +35,24 @@ const SignUp = () => {
         password,
       });
 
-      const { uid } = response.data; // Assuming the response includes UID as "uid"
-      
+      const { uid, token } = response.data; // Assuming the response includes UID as "uid" and JWT token as "token"
+
+      // Save UID and JWT to AuthContext
+      setAuthState({ uid });
+
       // Fetch user info to get the name for the welcome message
       const userResponse = await axios.get(`${url}/users/${uid}`);
-      setUserName(userResponse.data.name);  // Assuming the response includes "name"
-      
+      setUserName(userResponse.data.name); // Assuming the response includes "name"
+
       // Show the welcome modal
       setShowModal(true);
-
     } catch (error) {
       const axiosError = error as AxiosError;
-  
+
       if (axiosError.response) {
         // Assert that response.data matches the ErrorResponse structure
         const errorData = axiosError.response.data as ErrorResponse;
-        
+
         console.error('Error during sign-up:', errorData.message);
         Alert.alert('Error', errorData.message || 'Server error. Please try again.');
       } else {
@@ -60,12 +64,12 @@ const SignUp = () => {
 
   const handleModalClose = () => {
     setShowModal(false);
-    router.push(`/(home)?uid=${userName}`);
+    router.push('/(home)'); // Redirect to home page after modal closes
   };
 
   return (
     <View className="flex-1 justify-center items-center bg-custom-background px-10">
-      <StatusBar barStyle="dark-content"/>
+      <StatusBar barStyle="dark-content" />
       {/* Back Arrow */}
       <BackArrow />
 
@@ -113,22 +117,13 @@ const SignUp = () => {
       />
 
       {/* Sign Up Button */}
-      <SignInButton
-        onPress={handleSignUp}
-        title={'Sign Up'}
-      />
+      <SignInButton onPress={handleSignUp} title={'Sign Up'} />
 
       {/* Sign In with Google Button */}
-      <GoogleButton
-        onPress={() => console.log('Sign in with Google')}
-      />
+      <GoogleButton onPress={() => console.log('Sign in with Google')} />
 
       {/* Success Modal */}
-      <WelcomeModal
-        visible={showModal}
-        name={userName}
-        onAnimationEnd={handleModalClose}
-      />
+      <WelcomeModal visible={showModal} name={userName} onAnimationEnd={handleModalClose} />
 
       {/* Link to Sign In */}
       <View className="flex mt-4">
