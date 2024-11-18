@@ -1,42 +1,55 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface AuthContextType {
-  user: string | null;
-  login: (uid: string) => void;
-  logout: () => void;
-}
+// Define the shape of the AuthContext
+export type AuthContextType = {
+  uid: string | null;
+  setAuthState: (state: { uid: string | null }) => Promise<void>;
+};
 
+// Create the AuthContext
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<string | null>(null);
+// Define the props for the AuthProvider
+type AuthProviderProps = {
+  children: ReactNode;
+};
 
-  // Load user from AsyncStorage when the app starts
+// AuthProvider Component
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [uid, setUid] = useState<string | null>(null);
+
+  const setAuthState = async (state: { uid: string | null }) => {
+    try {
+      setUid(state.uid);
+      if (state.uid) {
+        await AsyncStorage.setItem('authState', JSON.stringify(state));
+      } else {
+        await AsyncStorage.removeItem('authState');
+      }
+    } catch (error) {
+      console.error('Error updating auth state:', error);
+    }
+  };
+
   useEffect(() => {
-    const loadUser = async () => {
-      const storedUser = await AsyncStorage.getItem('user');
-      if (storedUser) {
-        setUser(storedUser);
+    const loadAuthState = async () => {
+      try {
+        const storedAuthState = await AsyncStorage.getItem('authState');
+        if (storedAuthState) {
+          const parsedState = JSON.parse(storedAuthState);
+          setUid(parsedState.uid);
+        }
+      } catch (error) {
+        console.error('Error loading auth state:', error);
       }
     };
-    loadUser();
+
+    loadAuthState();
   }, []);
 
-  // Save user to AsyncStorage and update the state on login
-  const login = async (uid: string) => {
-    setUser(uid);
-    await AsyncStorage.setItem('user', uid);
-  };
-
-  // Clear user from AsyncStorage and update the state on logout
-  const logout = async () => {
-    setUser(null);
-    await AsyncStorage.removeItem('user');
-  };
-
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ uid, setAuthState }}>
       {children}
     </AuthContext.Provider>
   );
