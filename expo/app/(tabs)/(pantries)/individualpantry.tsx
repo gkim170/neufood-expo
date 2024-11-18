@@ -9,8 +9,7 @@ import axios, { AxiosError } from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 
 const UID = "user-1729689547676"; //for me aka long thor :)
-const url = process.env.EXPO_PUBLIC_API_URL_HOME;
-//const url = process.env.EXPO_PUBLIC_API_URL_LEHIGH;
+const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface ErrorResponse {
   message: string;
@@ -39,6 +38,7 @@ interface PantryDetails {
   pantryId: string; // The unique ID for the pantry
   name: string; // The name of the pantry
   ownerId: string; // The owner ID of the pantry
+  imageSource?: string; //image source of the pantry
   collaborators: Collaborator[]; // List of collaborators
   ingredients: Ingredient[]; // List of ingredients in the pantry
   __v: number; // MongoDB version key
@@ -181,18 +181,7 @@ const IndividualPantry = () => {
   const handleAddIngredient = () => {
     setModalVisible(true);
   };
-/**
- * 
- * @param ingredient 
- * // DELETE route to delete ingredient(s) from a pantry
-//      takes in array of ingredient names (ex. ingredientNames = ["9999", "Cashew"]; )
-router.delete('/:pantryId/deleteIngredients', async (req, res) => {
-    try {
-/*
-curl -X DELETE -H "Content-Type: application/json" -d '{
-    "ingredientNames": ["9999", "Cashew"]
-}' http://localhost:8080/pantries/4/deleteIngredients
-*/
+
 const handleUse = async (ingredient: Ingredient) => {
   // If quantity is zero or less, delete the ingredient from the pantry
   if (ingredient.quantity <= 0) {
@@ -217,7 +206,7 @@ const handleUse = async (ingredient: Ingredient) => {
   try {
       await axios.put(
           `${url}/pantries/${selectedPantryId}/modifyIngredient`,
-          {data: { modifiedIngredient } }
+          { modifiedIngredient }
       );
       console.log("Ingredient quantity decremented successfully.");
       pantryListRetriever();
