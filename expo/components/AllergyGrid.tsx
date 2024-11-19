@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, Button } from 'react-native';
 import SelectionButton from './SelectionButton'; 
 
-const AllergyGrid = () => {
+interface AllergyProps {
+  onMessageSend: (message: string[]) => void;
+}
+
+const AllergyGrid: React.FC<AllergyProps> = ({ onMessageSend }) => {
+
   // Initialize state of all buttons to false or unselected
   const [selectedButtons, setSelectedButtons] = useState([false, false, false, false, 
                                                         false, false, false, false,
@@ -10,7 +15,6 @@ const AllergyGrid = () => {
 
 
   // Define button names for each row
-//   const recipeTypeButtons
   const allergyFirstRow = [
     "Egg",
     "Peanut",
@@ -30,7 +34,9 @@ const AllergyGrid = () => {
     "Sesame"
   ]
 
-
+  const allergies = ["Egg", "Peanut", "Treenut", "Dairy", 
+    "Fish", "Soy", "Shellfish", "Gluten",
+    "Wheat", "Sesame"]
 
   // Change the button state when pressed
   const toggleButton = (index: number) => {
@@ -46,6 +52,13 @@ const AllergyGrid = () => {
     return selectedButtons
       .map((isSelected, index) => isSelected ? index : -1)  // Map true indices to actual index, false to -1
       .filter(index => index !== -1);  // Filter out the -1 values
+  };
+
+  // retrieve allergies selected
+  const sendMessage = () => {
+    const indices = getSelectedIndices();
+    const message = indices.map(index => allergies[index]);
+    onMessageSend(message);  // This calls the function passed from the parent
   };
 
   return (
@@ -85,6 +98,9 @@ const AllergyGrid = () => {
         />
         ))}
       </View>
+
+      {/* submit button */}
+      <Button title="Save Changes" onPress={sendMessage} />
     </View>
 
 
