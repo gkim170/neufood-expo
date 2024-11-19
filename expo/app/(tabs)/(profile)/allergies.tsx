@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
-import React, { useEffect } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Button } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import CustomButton from '../../../components/CustomButton';
 import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
+import AllergyGrid from '@/components/AllergiesButtonGrid';
 
 
 const allergies = () => {
@@ -12,15 +13,30 @@ const allergies = () => {
     console.log('Allergies page rendered');
   }, []);
 
-const handleEdit = () => {
-  console.log('edit allergies...'); 
+  const handleEdit = () => {
+    console.log('edit allergies...'); 
+
+    setModalVisible(true); 
     
     // // Navigate to edit profile
     // navigation.navigate('editprofile', { 
     //   user,
     //   updateUser: (updatedUser) => setUser(updatedUser),
     //  });
-}
+  }
+
+  // State to control the visibility of the modal
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Function to toggle modal visibility
+  const toggleModal = () => {
+    setModalVisible(!modalVisible);
+  };
+
+  const saveallergies = () => {
+
+    setModalVisible(!modalVisible);
+  };
 
   return (
     <View className="flex-1 justify-center items-center bg-custom-background">
@@ -43,6 +59,25 @@ const handleEdit = () => {
         <View style={styles.allergybuttons}>
 
         </View>
+
+        {/* Modal Component */}
+        <Modal
+          animationType="slide"
+          transparent={true}     // To make the background dim
+          visible={modalVisible}
+          onRequestClose={toggleModal} // Handle Android back button press
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>My Allergies</Text>
+              <AllergyGrid/>
+              <View style={styles.modalbuttons}>
+                <Button title="Save Changes" onPress={saveallergies} />
+                <Button title="Close" onPress={toggleModal} />
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </View>
   );
@@ -82,4 +117,25 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   allergybuttons: {},
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dimming background
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {
+    marginBottom: 20,
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  modalbuttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  }
 })
