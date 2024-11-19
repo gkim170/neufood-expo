@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import CustomButton from '../../../components/CustomButton';
 import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
-import AllergyGrid from '@/components/AllergiesButtonGrid';
+import AllergyGrid from '@/components/AllergyGrid';
+import { AllergySelection } from '@/components/AllergySelection';
 
 
 const allergies = () => {
@@ -13,16 +13,13 @@ const allergies = () => {
     console.log('Allergies page rendered');
   }, []);
 
+  const allergies = ["Egg", "Peanut", "Treenut", "Dairy", 
+                    "Fish", "Soy", "Shellfish", "Gluten",
+                    "Wheat", "Sesame"]
+
   const handleEdit = () => {
     console.log('edit allergies...'); 
-
     setModalVisible(true); 
-    
-    // // Navigate to edit profile
-    // navigation.navigate('editprofile', { 
-    //   user,
-    //   updateUser: (updatedUser) => setUser(updatedUser),
-    //  });
   }
 
   // State to control the visibility of the modal
@@ -33,8 +30,10 @@ const allergies = () => {
     setModalVisible(!modalVisible);
   };
 
-  const saveallergies = () => {
-
+  const saveAllergies = () => {
+    // const {selectedButtons, getSelectedIndices} = AllergySelection();
+    // console.log(selectedButtons);
+    AllergyGrid.getSelectedIndices();
     setModalVisible(!modalVisible);
   };
 
@@ -72,7 +71,7 @@ const allergies = () => {
               <Text style={styles.modalText}>My Allergies</Text>
               <AllergyGrid/>
               <View style={styles.modalbuttons}>
-                <Button title="Save Changes" onPress={saveallergies} />
+                <Button title="Save Changes" onPress={saveAllergies} />
                 <Button title="Close" onPress={toggleModal} />
               </View>
             </View>
