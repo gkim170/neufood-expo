@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
 import AllergyGrid from '@/components/AllergyGrid';
-import { AllergySelection } from '@/components/AllergySelection';
 
 
 const allergies = () => {
@@ -13,27 +12,21 @@ const allergies = () => {
     console.log('Allergies page rendered');
   }, []);
 
-  const allergies = ["Egg", "Peanut", "Treenut", "Dairy", 
-                    "Fish", "Soy", "Shellfish", "Gluten",
-                    "Wheat", "Sesame"]
-
+  // set modal to invisible as default
+  const [modalVisible, setModalVisible] = useState(false);
+  
   const handleEdit = () => {
     console.log('edit allergies...'); 
     setModalVisible(true); 
   }
-
-  // State to control the visibility of the modal
-  const [modalVisible, setModalVisible] = useState(false);
 
   // Function to toggle modal visibility
   const toggleModal = () => {
     setModalVisible(!modalVisible);
   };
 
-  const saveAllergies = () => {
-    // const {selectedButtons, getSelectedIndices} = AllergySelection();
-    // console.log(selectedButtons);
-    AllergyGrid.getSelectedIndices();
+  const handleChange = (newMessage: string[]) => {
+    console.log(newMessage);
     setModalVisible(!modalVisible);
   };
 
@@ -69,9 +62,8 @@ const allergies = () => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalText}>My Allergies</Text>
-              <AllergyGrid/>
+              <AllergyGrid onMessageSend={handleChange}/>
               <View style={styles.modalbuttons}>
-                <Button title="Save Changes" onPress={saveAllergies} />
                 <Button title="Close" onPress={toggleModal} />
               </View>
             </View>
