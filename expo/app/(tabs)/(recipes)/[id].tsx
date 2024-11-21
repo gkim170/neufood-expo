@@ -17,6 +17,7 @@ const RecipeDetailScreen = () => {
     const encodedRecipeUri = encodeURIComponent(recipeUri);
     console.log('URI', encodedRecipeUri);
     return `https://api.edamam.com/api/recipes/v2/by-uri?type=public&uri=${encodedRecipeUri}&app_id=${id}&app_key=${key}`;
+    // return `https://api.edamam.com/api/recipes/v2/by-uri?type=public&uri={encodedRecipeUri}&app_id={id}&app_key={key}&field=uri&field=label&field=image&field=images&field=source&field=url&field=shareAs&field=yield&field=dietLabels&field=healthLabels&field=cautions&field=ingredientLines&field=ingredients&field=calories&field=glycemicIndex&field=inflammatoryIndex&field=totalCO2Emissions&field=co2EmissionsClass&field=totalWeight&field=totalTime&field=cuisineType&field=mealType&field=dishType&field=totalNutrients&field=totalDaily`;
   };
 
     // useEffect hook to fetch recipes from the API
@@ -58,21 +59,27 @@ const RecipeDetailScreen = () => {
     const IngredientList = () => (
       <View>
         {recipe.ingredientLines?.map((ingredient, index) => (
-          <View className="p-1"> 
-            <Text key={index}>{ingredient}</Text>
+          <View key={index} className="p-1"> 
+            <Text className="font-primary">{ingredient}</Text>
           </View>
         ))}
       </View>
     );
-    
-    // This doesn't have anything in it yet, need to grab more data
+  
     const RecipeNutrition = () => (
       <View>
-        <Text>Nutrients</Text>
+        <View>
+          {Object.entries(recipe.totalNutrients || {}).map(([key, nutrient]) => (
+            <View key={key} className="p-1 flex-row">
+              <Text className="font-bold">{nutrient.label}: </Text>
+              <Text>
+                {Math.round(nutrient.quantity)} {nutrient.unit}
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
     );
-
-    const roundedCalories = Math.round(recipe.calories);
 
     return (
       <View className="flex-1 bg-custom-background">
@@ -90,7 +97,9 @@ const RecipeDetailScreen = () => {
               </View>
               <View className="px-5">
                 <Text className="text-2xl font-bold mt-4">{recipe.label}</Text>
-                <Text className="font-primary text-gray-600">Calories: {roundedCalories} kcal</Text>
+                <Text className="font-primary text-gray-600">Dish type: {recipe.dishType}</Text>
+                <Text className="font-primary text-gray-600">Cuisine type: {recipe.cuisineType}</Text>
+                <Text className="font-primary text-gray-600">Calories: {Math.round(recipe.calories)} kcal</Text>
                 <Text className="font-primary text-gray-600">Total Time: {recipe.totalTime} minutes</Text>
               </View>
             </View>
