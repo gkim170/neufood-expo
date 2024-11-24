@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FavoriteButton from '@/components/FavoriteButton';
 import RecipeCard from './recipeCard';
 import { useLocalSearchParams } from 'expo-router';
-
+import axios from 'axios';
 
 
 const Generated = () => {
@@ -22,7 +22,21 @@ const Generated = () => {
     }
   }, [pantryId]);
 
+  const getIngredients = async () => {
+    try {
+      const response = await fetch(`${url}/pantries/${pantryId}`);  // Get info from pantry by pantryID
+      const pantry = await response.json();
   
+      const ingredients = pantry.ingredients.map((ingredient: { name: string }) => ingredient.name); // Get just the ingredients by name
+      console.log('Ingredient Names:', ingredients);
+      return ingredients; 
+      
+    } catch (error) {
+      console.error('Error fetching pantry ingredients:', error);
+    }
+  };
+
+  getIngredients();
 
   // hard coded query and diet for now, we will eventually get these from the users profile preferences and add more such as health, cuisineType, mealType, and dishType
   const query = "chicken%20wings%2C%20apple";
