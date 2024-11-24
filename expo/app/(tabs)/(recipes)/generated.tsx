@@ -4,11 +4,25 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FavoriteButton from '@/components/FavoriteButton';
 import RecipeCard from './recipeCard';
+import { useLocalSearchParams } from 'expo-router';
+
+
 
 const Generated = () => {
   const router = useRouter();
+  const { pantryId } = useLocalSearchParams(); // get the selected pantry id from 
   const [recipes, setRecipes] = useState([]);
   const [error, setError] = useState(null);
+  const url = process.env.EXPO_PUBLIC_API_URL;
+
+  useEffect(() => {
+    if (pantryId) {
+      console.log(`Selected Pantry ID in Generated.tsx: ${pantryId}`);
+      // You can now use pantryId to modify the query or fetch data specific to this pantry
+    }
+  }, [pantryId]);
+
+  
 
   // hard coded query and diet for now, we will eventually get these from the users profile preferences and add more such as health, cuisineType, mealType, and dishType
   const query = "chicken%20wings%2C%20apple";
