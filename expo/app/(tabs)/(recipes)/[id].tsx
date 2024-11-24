@@ -52,7 +52,13 @@ const RecipeDetailScreen = () => {
 
 
   if (!recipe) {
-    return <Text>No recipe found</Text>;
+    return (
+      <View className="flex-1 justify-center items-center bg-custom-background px-8">
+        <Text className="text-lg font-bold mt-2">
+          Recipe loading
+        </Text>
+      </View>
+    );
   }
   else {
     // Lists are used at the bottom of the screen
@@ -97,10 +103,11 @@ const RecipeDetailScreen = () => {
               </View>
               <View className="px-5">
                 <Text className="text-2xl font-bold mt-4">{recipe.label}</Text>
-                <Text className="font-primary text-gray-600">Dish type: {recipe.dishType}</Text>
-                <Text className="font-primary text-gray-600">Cuisine type: {recipe.cuisineType}</Text>
-                <Text className="font-primary text-gray-600">Calories: {Math.round(recipe.calories)} kcal</Text>
                 <Text className="font-primary text-gray-600">Total Time: {recipe.totalTime} minutes</Text>
+                <Text className="font-primary text-gray-600">Servings: {recipe.yield}</Text>
+                {/* <Text></Text>
+                <Text className="font-primary text-gray-600">Dish type: {recipe.dishType}</Text>
+                <Text className="font-primary text-gray-600">Cuisine type: {recipe.cuisineType}</Text> */}
               </View>
             </View>
           </View>
