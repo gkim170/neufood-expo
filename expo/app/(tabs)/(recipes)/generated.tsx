@@ -13,34 +13,34 @@ const Generated = () => {
   const { pantryId } = useLocalSearchParams(); // get the selected pantry id from 
   const [recipes, setRecipes] = useState([]);
   const [error, setError] = useState(null);
+  const [query, setQuery] = useState('');
+  const [diet, setDiet] = useState('balanced');  // there are other options for things to filter edamam api request by, look at edamam documentation to see
   const url = process.env.EXPO_PUBLIC_API_URL;
 
   useEffect(() => {
-    if (pantryId) {
-      console.log(`Selected Pantry ID in Generated.tsx: ${pantryId}`);
-      // You can now use pantryId to modify the query or fetch data specific to this pantry
-    }
+    const getIngredients = async () => {
+      if (pantryId){
+        try {
+          const response = await fetch(`${url}/pantries/${pantryId}`);  // Get info from pantry by pantryID
+          const pantry = await response.json();
+      
+          // put ingredients in format needed to pass into the edamam api request
+          const formattedIngredients = pantry.ingredients
+          .map((ingredient: { name: string }) => encodeURIComponent(ingredient.name)) // Encode each ingredient
+          .join('%2C%20'); // Join with "%2C%20" (comma and space)
+    
+          console.log('Ingredient Names:', formattedIngredients);
+          setQuery(formattedIngredients); // set the query to the ingredients
+          setRecipes([]); // reset recipes
+        } catch (error) {
+          console.error('Error fetching pantry ingredients:', error);
+        }
+      }
+    };
+
+    getIngredients();
   }, [pantryId]);
 
-  const getIngredients = async () => {
-    try {
-      const response = await fetch(`${url}/pantries/${pantryId}`);  // Get info from pantry by pantryID
-      const pantry = await response.json();
-  
-      const ingredients = pantry.ingredients.map((ingredient: { name: string }) => ingredient.name); // Get just the ingredients by name
-      console.log('Ingredient Names:', ingredients);
-      return ingredients; 
-      
-    } catch (error) {
-      console.error('Error fetching pantry ingredients:', error);
-    }
-  };
-
-  getIngredients();
-
-  // hard coded query and diet for now, we will eventually get these from the users profile preferences and add more such as health, cuisineType, mealType, and dishType
-  const query = "chicken%20wings%2C%20apple";
-  const diet = "balanced";
 
   // Make sure EXPO_PUBLIC_EDAMAM_APP_ID and EXPO_PUBLIC_EDAMAM_APP_KEY are defined as strings in .env that's in the root of the project
   const getRecipesSearchRequestURL = (query: string, diet: string) => {
@@ -52,21 +52,22 @@ const Generated = () => {
    // useEffect hook to fetch recipes from the API
   useEffect(() => {
     const fetchRecipes = async () => {
-      try {
-        const response = await fetch(getRecipesSearchRequestURL(query, diet)); // Make the API request using the constructed URL with query and diet parameters
-        const data = await response.json(); // Parse the JSON response from the API
-        console.log("Edamam API Response:", data); // Logging the response for development purposes
-        setRecipes(data.hits.map(hit => hit.recipe)); // If the request is successful, update the state with the fetched recipes
-      } catch (error) {
-        // If there is an error, log it for testing purposes
-        console.error("Error fetching response:", error);
-        setError(error);
+      if (query && diet){
+        try {
+          const response = await fetch(getRecipesSearchRequestURL(query, diet)); // Make the API request using the constructed URL with query and diet parameters
+          const data = await response.json(); // Parse the JSON response from the API
+          console.log("Edamam API Response:", data); // Logging the response for development purposes
+          setRecipes(data.hits.map(hit => hit.recipe)); // If the request is successful, update the state with the fetched recipes
+        } catch (error) {
+          // If there is an error, log it for testing purposes
+          console.error("Error fetching response:", error);
+          setError(error);
+        }
       }
     };
     // Call the fetch function when the query or diet changes
     fetchRecipes();
-  }, [query, diet]);
-
+  }, [query, diet]); 
 
   // If there's an error, display a message on the page for the user
   if (error) {
@@ -100,6 +101,7 @@ const Generated = () => {
             <RecipeCard recipe={recipe} />
           </TouchableOpacity>
         )}
+        showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
