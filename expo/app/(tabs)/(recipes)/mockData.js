@@ -44,3 +44,5 @@ export const mockRecipes = [
     },
   ];
   
+
+export default mockRecipes;

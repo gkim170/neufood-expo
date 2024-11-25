@@ -118,10 +118,19 @@ const Selection = () => {
       </View>
 
       <View className="items-center mb-4">
-        <DarkButton
-          onPress={() => router.push('./generated')}
-          title={'Show Me Recipes'}
-        />
+      <DarkButton
+        onPress={() => {
+          if (selectedPantryId) {
+            router.push({
+              pathname: './generated',
+              params: { pantryId: selectedPantryId }, // Pass the pantry id when button is pressed
+            });
+          } else {
+            console.error("No pantry selected.");
+          }
+        }}
+        title={'Show Me Recipes'}
+      />
       </View>
     </SafeAreaView>
   );

@@ -4,15 +4,45 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FavoriteButton from '@/components/FavoriteButton';
 import RecipeCard from './recipeCard';
+import { useLocalSearchParams } from 'expo-router';
+import axios from 'axios';
+import BackArrow from '@/components/BackArrow';
+
 
 const Generated = () => {
   const router = useRouter();
+  const { pantryId } = useLocalSearchParams(); // get the selected pantry id from 
   const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [query, setQuery] = useState('');
+  const [diet, setDiet] = useState('balanced');  // there are other options for things to filter edamam api request by, look at edamam documentation to see
+  const url = process.env.EXPO_PUBLIC_API_URL;
 
-  // hard coded query and diet for now, we will eventually get these from the users profile preferences and add more such as health, cuisineType, mealType, and dishType
-  const query = "chicken%20wings%2C%20apple";
-  const diet = "balanced";
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      if (pantryId){
+        try {
+          const response = await fetch(`${url}/pantries/${pantryId}`);  // Get info from pantry by pantryID
+          const pantry = await response.json();
+      
+          // put ingredients in format needed to pass into the edamam api request
+          const formattedIngredients = pantry.ingredients
+          .map((ingredient: { name: string }) => encodeURIComponent(ingredient.name)) // Encode each ingredient
+          .join('%2C%20'); // Join with "%2C%20" (comma and space)
+    
+          console.log('Ingredient Names:', formattedIngredients);
+          setQuery(formattedIngredients); // set the query to the ingredients
+          setRecipes([]); // reset recipes
+        } catch (error) {
+          console.error('Error fetching pantry ingredients:', error);
+        }
+      }
+    };
+
+    fetchIngredients();
+  }, [pantryId]);
+
 
   // Make sure EXPO_PUBLIC_EDAMAM_APP_ID and EXPO_PUBLIC_EDAMAM_APP_KEY are defined as strings in .env that's in the root of the project
   const getRecipesSearchRequestURL = (query: string, diet: string) => {
@@ -24,18 +54,19 @@ const Generated = () => {
    // useEffect hook to fetch recipes from the API
   useEffect(() => {
     const fetchRecipes = async () => {
+      setLoading(true);  // Set loading to true before starting fetch
       try {
         const response = await fetch(getRecipesSearchRequestURL(query, diet)); // Make the API request using the constructed URL with query and diet parameters
         const data = await response.json(); // Parse the JSON response from the API
         console.log("Edamam API Response:", data); // Logging the response for development purposes
         setRecipes(data.hits.map(hit => hit.recipe)); // If the request is successful, update the state with the fetched recipes
       } catch (error) {
-        // If there is an error, log it for testing purposes
         console.error("Error fetching response:", error);
         setError(error);
+      } finally {
+        setLoading(false);  // Set loading to false after the fetch completes
       }
     };
-    // Call the fetch function when the query or diet changes
     fetchRecipes();
   }, [query, diet]);
 
@@ -60,19 +91,29 @@ const Generated = () => {
     });
   };
 
+
   // Render the list of recipes once they're successfully fetched
   return (
     <SafeAreaView className="flex-1 bg-custom-background px-8">
-      {/* Display the recipes in a FlatList */}
-      <FlatList
-        data={recipes}
-        keyExtractor={(recipe) => recipe.uri}  // Use recipe URI as the unique key
-        renderItem={({ item: recipe }) => (
-          <TouchableOpacity onPress={() => handleRecipePress(recipe)}>
-            <RecipeCard recipe={recipe} />
-          </TouchableOpacity>
-        )}
-      />
+      {loading ? (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-lg font-bold">Loading recipes...</Text>
+        </View>
+      ) : recipes.length === 0 ? (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-lg font-bold">No recipes found</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={recipes}
+          keyExtractor={(recipe) => recipe.uri}  // Use recipe URI as the unique key
+          renderItem={({ item: recipe }) => (
+            <TouchableOpacity onPress={() => handleRecipePress(recipe)}>
+              <RecipeCard recipe={recipe} />
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 };
