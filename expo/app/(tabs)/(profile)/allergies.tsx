@@ -4,7 +4,14 @@ import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import BackArrow from '@/components/BackArrow';
 import AllergyGrid from '@/components/AllergyGrid';
+import axios, { AxiosError } from 'axios';
 
+// temporary, hard-coded UID
+const UID = "333";
+const url = process.env.EXPO_PUBLIC_API_URL;
+
+// for get: `${url}/users/${UID}/`
+// for put: `${url}/users/${UID}/allergies`
 
 const allergies = () => {
   // Used to make sure we get here correctly (for testing), can see this log in the terminal
@@ -25,6 +32,7 @@ const allergies = () => {
     setModalVisible(!modalVisible);
   };
 
+  // retrieve selected allergies, updates to database and re-load the page
   const handleChange = (newMessage: string[]) => {
     console.log(newMessage);
     setModalVisible(!modalVisible);
