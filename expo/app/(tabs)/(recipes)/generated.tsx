@@ -11,13 +11,37 @@ import BackArrow from '@/components/BackArrow';
 
 const Generated = () => {
   const router = useRouter();
-  const { pantryId } = useLocalSearchParams(); // get the selected pantry id from 
+  const { pantryId, userId } = useLocalSearchParams(); // get the selected pantry id and user id from 
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
+  const [healthPreferences, setHealthPreferences] = useState('');
   const [diet, setDiet] = useState('balanced');  // there are other options for things to filter edamam api request by, look at edamam documentation to see
   const url = process.env.EXPO_PUBLIC_API_URL;
+
+  useEffect(() => {
+    const fetchHealthPreferences = async () => {
+      try {
+        const response = await fetch(`${url}/users/${userId}/`); // Fetch user data by userId
+        const userData = await response.json();
+
+        // Map allergies into `health` parameters
+        const formattedHealthPreferences = userData.allergies
+          .map((allergy: string) => `health=${encodeURIComponent(allergy)}`) // Format each health label as health=allergy because that is what the Edamam request expects 
+          .join('&'); // Join with '&' for separate parameters
+
+        console.log('Health Preferences:', formattedHealthPreferences);
+        setHealthPreferences(formattedHealthPreferences);
+        } catch (error) {
+          console.error('Error fetching user allergies:', error);
+        }
+    };
+  
+    fetchHealthPreferences();
+  }, [userId]);
+
+
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -41,14 +65,13 @@ const Generated = () => {
     };
 
     fetchIngredients();
-  }, [pantryId]);
-
+  }, [pantryId]); 
 
   // Make sure EXPO_PUBLIC_EDAMAM_APP_ID and EXPO_PUBLIC_EDAMAM_APP_KEY are defined as strings in .env that's in the root of the project
-  const getRecipesSearchRequestURL = (query: string, diet: string) => {
+  const getRecipesSearchRequestURL = (query: string, diet: string, healthPreferences: string) => {
     const id = process.env.EXPO_PUBLIC_EDAMAM_APP_ID;
     const key = process.env.EXPO_PUBLIC_EDAMAM_APP_KEY;
-    return `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${id}&app_key=${key}&diet=${diet}&imageSize=REGULAR&field=uri&field=label&field=image&field=images&field=source&field=url&field=ingredientLines&field=calories&field=totalTime`;
+    return `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${id}&app_key=${key}&diet=${diet}&${healthPreferences}&imageSize=REGULAR&field=uri&field=label&field=image&field=images&field=source&field=url&field=ingredientLines&field=calories&field=totalTime`;
   };
 
    // useEffect hook to fetch recipes from the API

@@ -123,7 +123,10 @@ const Selection = () => {
           if (selectedPantryId) {
             router.push({
               pathname: './generated',
-              params: { pantryId: selectedPantryId }, // Pass the pantry id when button is pressed
+              params: { 
+                pantryId: selectedPantryId,
+                userId: UID
+              }, // Pass the pantry id and user id when button is pressed
             });
           } else {
             console.error("No pantry selected.");
