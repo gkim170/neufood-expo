@@ -6,6 +6,7 @@ import GoogleButton from '@/components/GoogleButton';
 import { Link, router } from 'expo-router';
 import axios, { AxiosError } from 'axios';
 import WelcomeModal from '@/components/WelcomeModal'; // Import the WelcomeModal
+import { useAuth } from '@/components/AuthContext';
 
 const url = process.env.EXPO_PUBLIC_API_URL;
 
@@ -15,37 +16,32 @@ interface ErrorResponse {
 }
 
 const SignIn = () => {
+  const { setAuthState } = useAuth(); // Use the AuthContext to set auth state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [userName, setUserName] = useState('');
 
   const handleSignIn = async () => {
-    
-    // Handle sign-in logic here 
     try {
       // Make a POST request to the backend server
-      const response = await axios.post(`${url}/auth/login`, {
-        email,
-        password,
-      });
-
+      const response = await axios.post(`${url}/auth/login`, { email, password });
       const { uid } = response.data; // Assuming the response includes UID as "uid"
+
+      // Persist the UID in the AuthContext
+      await setAuthState({ uid });
 
       // Fetch user info to get the name for the welcome message
       const userResponse = await axios.get(`${url}/users/${uid}`);
-      setUserName(userResponse.data.name);  // Assuming the response includes "name"
-      
+      setUserName(userResponse.data.name);
+
       // Show the welcome modal
       setShowModal(true);
-
     } catch (error) {
       const axiosError = error as AxiosError;
-  
+
       if (axiosError.response) {
-        // Assert that response.data matches the ErrorResponse structure
         const errorData = axiosError.response.data as ErrorResponse;
-        
         console.error('Error during sign-in:', errorData.message);
         Alert.alert('Error', errorData.message || 'Server error. Please try again.');
       } else {
@@ -57,20 +53,17 @@ const SignIn = () => {
 
   const handleModalClose = () => {
     setShowModal(false);
-    router.push(`/(home)?uid=${userName}`);
+    router.push('/(home)'); // Redirect to home page after modal closes
   };
 
   return (
     <View className="flex-1 justify-center items-center bg-custom-background px-10">
-      <StatusBar barStyle="dark-content"/>
-      
-      {/* Back Arrow */}
+      <StatusBar barStyle="dark-content" />
+
       <BackArrow />
 
-      {/* Title */}
       <Text className="font-bold text-3xl mb-10">Welcome Back</Text>
 
-      {/* Email Input */}
       <TextInput
         className="border border-black rounded-2xl p-7 pl-4 pt-2 mb-4 w-full"
         placeholder="Email"
@@ -82,7 +75,6 @@ const SignIn = () => {
         placeholderTextColor="#6D6868"
       />
 
-      {/* Password Input */}
       <TextInput
         className="border border-black rounded-2xl p-7 pl-4 pt-2 mb-4 w-full"
         placeholder="Password"
@@ -92,25 +84,11 @@ const SignIn = () => {
         placeholderTextColor="#6D6868"
       />
 
-      {/* Sign In Button */}
-      <SignInButton
-        onPress={handleSignIn}
-        title={'Sign In'}
-      />
+      <SignInButton onPress={handleSignIn} title="Sign In" />
+      <GoogleButton onPress={() => console.log('Sign in with Google')} />
 
-      {/* Sign In with Google Button */}
-      <GoogleButton
-        onPress={() => console.log('Sign in with Google')}
-      />
+      <WelcomeModal visible={showModal} name={userName} onAnimationEnd={handleModalClose} />
 
-      {/* Success Modal */}
-      <WelcomeModal
-        visible={showModal}
-        name={userName}
-        onAnimationEnd={handleModalClose}
-      />
-
-      {/* Link to Sign Up */}
       <View className="flex">
         <Text className="font-primary text-gray-600">
           Don't have an account?{' '}

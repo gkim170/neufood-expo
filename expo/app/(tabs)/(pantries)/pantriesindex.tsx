@@ -2,13 +2,13 @@ import { View, Text, Image, Modal, TouchableOpacity, TextInput, ScrollView } fro
 import React, { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import DarkButton from '@/components/DarkButton';
-import { Dropdown } from 'react-native-element-dropdown'
+import { Dropdown } from 'react-native-element-dropdown';
 import PantryButton from '@/components/PantryButton';
 import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
 import axios, { AxiosError } from 'axios';
+import { useAuth } from '@/components/AuthContext'; // Import the AuthContext
 
-const UID = "user-1729689547676"; //for me aka long thor :)
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface ErrorResponse {
@@ -20,135 +20,116 @@ interface PantryDetails {
   pantryName: string;
   imageSource: string;
 }
-const pantryimages = [
+
+const pantryImages = [
   { label: 'Apartment', value: 'Apartment' },
   { label: 'Dorm', value: 'Dorm' },
   { label: 'House', value: 'House' },
   { label: 'Office', value: 'Office' },
   { label: 'Office2', value: 'Office2' },
 ];
-type PantryKeys =  'Apartment' | 'Dorm' | 'House' | 'Office' | 'Office2';
+type PantryKeys = 'Apartment' | 'Dorm' | 'House' | 'Office' | 'Office2';
 
 const Pantries = () => {
-    // stuff for adding pantry via modal (i like this better than navigating to multiple pages where data can be lost in transfer)
-    // State to control modal visibility
-    const [modalVisible, setModalVisible] = useState(false);
-    const [pantryName, setPantryName] = useState('');
-    const [collaboratorInput, setCollaboratorInput] = useState(''); // Temporary input for a single collaborator
-    const [collaborators, setCollaborators] = useState<string[]>([]);
-    const [pantries, setPantries] = useState<PantryDetails[]>([]);
-    const [pantryImagesOpen, setPantryImagesOpen] = useState(false);
-    const [pantryImage, setPantryImage] = useState('');
+  const { uid } = useAuth(); // Pull the UID dynamically from AuthContext
+  const [modalVisible, setModalVisible] = useState(false);
+  const [pantryName, setPantryName] = useState('');
+  const [collaboratorInput, setCollaboratorInput] = useState(''); // Temporary input for a single collaborator
+  const [collaborators, setCollaborators] = useState<string[]>([]);
+  const [pantries, setPantries] = useState<PantryDetails[]>([]);
+  const [pantryImagesOpen, setPantryImagesOpen] = useState(false);
+  const [pantryImage, setPantryImage] = useState('');
 
-    // Used to make sure we get here correctly (for testing), can see this log in the terminal
-    useEffect(() => {
-      console.log('Pantries page rendered');
-      pantryListRetriever();
-    }, []);
+  useEffect(() => {
+    console.log('Pantries page rendered');
+    pantryListRetriever();
+  }, []);
 
-    // Function to add collaborator to array
-    const addCollaborator = () => {
-      if (collaboratorInput.trim()) {
-        setCollaborators([...collaborators, collaboratorInput.trim()]);
-        setCollaboratorInput(''); // Clear input field after adding
-      }
-    };
-    // Handler for adding ingredients, toggles modal visibility
-    const handleAddPantry = () => {
-      setModalVisible(true);
-    };
-      // removes previously added words if the thing is bad and you change your mind
-    const handleCancelAdd = () => {
-      setModalVisible(false);
-      setPantryName('');
-      setPantryImage('');
-      setCollaborators([]);
-    };
+  const addCollaborator = () => {
+    if (collaboratorInput.trim()) {
+      setCollaborators([...collaborators, collaboratorInput.trim()]);
+      setCollaboratorInput('');
+    }
+  };
 
-    // Function to handle adding pantry (e.g., submitting the form) after the user inputs text. 
-    // Function to handle creating a new pantry
+  const handleAddPantry = () => {
+    setModalVisible(true);
+  };
+
+  const handleCancelAdd = () => {
+    setModalVisible(false);
+    setPantryName('');
+    setPantryImage('');
+    setCollaborators([]);
+  };
+
   const createPantry = async (pantryName: string, UID: string, pantryImage: string) => {
     try {
-      // Create a new pantry object
       const newPantry = {
         name: pantryName,
-        ownerId: UID, // Replace with actual ownerId from session or user context eventually
-        imageSource: pantryImage, // OKAY
+        ownerId: UID,
+        imageSource: pantryImage,
       };
-      console.log(newPantry);
 
-      // Post the new pantry data to the backend API
       const pantryResponse = await axios.post(`${url}/pantries/`, newPantry);
       const retrievedPantry = pantryResponse.data;
 
-      return retrievedPantry; // Return the pantry data for further use
+      return retrievedPantry;
     } catch (error) {
-      console.error("Error during pantry creation:", error);
+      console.error('Error during pantry creation:', error);
       throw new Error('There was an error creating the pantry. Please try again.');
     }
   };
 
-  // Function to handle adding collaborators to the pantry
-  const addCollaborators = async (pantryId: any, collaborators: any[]) => {
+  const addCollaborators = async (pantryId: string, collaborators: string[]) => {
     try {
-      if (collaborators && collaborators.length > 0) {
-        const collaboratorPayload = { collaborators: collaborators.map(collaborator => ({ uid: collaborator })) };
+      if (collaborators.length > 0) {
+        const collaboratorPayload = {
+          collaborators: collaborators.map((collaborator) => ({ uid: collaborator })),
+        };
 
-        // Send request to add collaborators to the pantry
-        const collaboratorResponse = await axios.put(
-          `${url}/pantries/${pantryId}/addCollaborators`,
-          collaboratorPayload
-        );
+        await axios.put(`${url}/pantries/${pantryId}/addCollaborators`, collaboratorPayload);
       }
     } catch (error) {
-      console.error("Error during adding collaborators:", error);
+      console.error('Error during adding collaborators:', error);
       throw new Error('There was an error adding collaborators. Please try again.');
     }
   };
 
-  // Function to handle submitting the pantry (e.g., submitting the form)
   const submitPantry = async () => {
     try {
-      // Step 1: Create the new pantry
-      console.log(pantryImage);
-      const retrievedPantry = await createPantry(pantryName, UID, pantryImage);
+      if (!uid) {
+        throw new Error('User ID is missing.');
+      }
 
-      // Step 2: Add collaborators to the pantry if they exist
+      const retrievedPantry = await createPantry(pantryName, uid, pantryImage);
+
       if (retrievedPantry) {
         await addCollaborators(retrievedPantry.pantryId, collaborators);
       }
 
-      // Step 3: Call to repopulate pantry list based on UID
       await pantryListRetriever();
-
-      // Step 4: Clear input and close modal
       handleCancelAdd();
-
     } catch (error) {
-      console.error("Error during pantry submission:", error);
+      console.error('Error during pantry submission:', error);
       alert('There was an error creating the pantry or adding collaborators. Please try again.');
-      //Clear input and close modal
-      setPantryName('');
-      setCollaborators([]);
-      setModalVisible(false);
     }
   };
 
-  //database connection (thanks rory)
-  // Get the list of pantries from the user's pantry array using uid, which is currently hardcoded as long thor's
   const pantryListRetriever = async () => {
     try {
-      // Send the get request to the database to get pantry ids
-      // Have to replace the constant UID with the user's actual ID eventually
-      const response = await axios.get(`${url}/users/${UID}/retrievePantries`);
+      if (!uid) {
+        console.error('UID is missing. Unable to retrieve pantries.');
+        return;
+      }
+
+      const response = await axios.get(`${url}/users/${uid}/retrievePantries`);
       const pantryIds = response.data;
-      
-      // Get the pantry names from the retrievePantryDetails function
+
       const pantryDetails = await retrievePantryDetails(pantryIds);
-      
-      // Set the pantry state to the details we received, the ids and name
+
       setPantries(pantryDetails);
-      console.log('Pantries retrieved');
+      console.log('Pantries retrieved', pantryDetails);
     } catch (error) {
       const axiosError = error as AxiosError;
       if (axiosError.response) {
@@ -160,7 +141,6 @@ const Pantries = () => {
     }
   };
 
-  // Get the name from each pantry using their pantryIds
   const retrievePantryDetails = async (pantryIds: string[]): Promise<PantryDetails[]> => {
     try {
       const pantryRequests = pantryIds.map(async (pantryId) => {
@@ -168,7 +148,7 @@ const Pantries = () => {
         const { pantryId: id, name, imageSource } = response.data;
         return { pantryId: id, pantryName: name, imageSource: imageSource };
       });
-      
+
       return await Promise.all(pantryRequests);
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -182,114 +162,94 @@ const Pantries = () => {
     }
   };
 
-
   return (
-    <View className="flex-1 justify-center items-center bg-custom-background">      
-      <DarkButton 
-        onPress={handleAddPantry} 
-        title={'Add Pantry'}
-        style={{ margin: 15 }}
-      />
-      
+    <View className="flex-1 justify-center items-center bg-custom-background">
+      <DarkButton onPress={handleAddPantry} title={'Add Pantry'} style={{ margin: 15 }} />
       {/* Modal popup for adding a new pantry */}
       <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)} //make it seen!
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
         >
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-            <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Add New Pantry</Text>
-              {/** Input pantry name */}
-              <TextInput
-                placeholder="Pantry Name"
-                value={pantryName}
-                onChangeText={setPantryName}
-                style={{ 
-                  borderRadius: 8,
-                  padding: 8,
-                  //marginBottom: 15, //somehow this looks bad with the 15
-                  borderWidth: 1, 
-                }}
-                placeholderTextColor= "#000" // Set the placeholder text color
-              />
-              <Dropdown
-                style={{
-                  borderRadius: 8,
-                  padding: 8,
-                  marginTop: 10,
-                  borderWidth: 1,
-                  borderColor: '#000',
-                }}
-                placeholderStyle={{ color: '#000', fontSize: 14 }}
-                selectedTextStyle={{ color: '#000', fontSize: 14 }}
-                data={pantryimages}
-                labelField="label"
-                valueField="value"
-                placeholder="Location"
-                value={pantryImage}
-                onFocus={() => setPantryImagesOpen(true)}
-                onBlur={() => setPantryImagesOpen(false)}
-                onChange={item => {
-                  setPantryImage(item.value);
-                  setPantryImagesOpen(false);
-                }}
-                maxHeight={200} // Set a maximum height if you have many items
-              />
-              {/** input and add collaborators*/}
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                <TextInput
-                  placeholder="Collaborator Id"
-                  value={collaboratorInput}
-                  onChangeText={setCollaboratorInput}
-                  inputMode="email"
-                  style={{ 
-                    borderRadius: 8,
-                    padding: 8,
-                    marginBottom: 15,
-                    borderWidth: 1, 
-                    flex: 1,
-                  }}
-                  placeholderTextColor= "#000" // Set the placeholder text color
-                />
-                {/* Add collaborator Button */}
-                <TouchableOpacity onPress={addCollaborator} style={{ marginLeft: 20, marginBottom: 15,padding: 8, backgroundColor: Colors.darkerGreen, borderRadius: 5, alignItems: 'center'  }}>
-                  <Text style={{ color: 'white', fontWeight: 'bold' }}>Add</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Submit Button */}
-              <TouchableOpacity onPress={submitPantry} style={{ padding: 10, backgroundColor: Colors.darkerGreen, borderRadius: 5, alignItems: 'center'  }}>
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>Add Pantry</Text>
-              </TouchableOpacity>
-
-              {/* Close Button */}
-              <TouchableOpacity onPress={() => handleCancelAdd()} style={{ marginTop: 10, alignItems: 'center' }}>
-                <Text style={{ color: 'grey' }}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-      <Text></Text>
-      {/** DYNAMICALLY POPULATE FOR A LIST OF JSON! */}
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 15}} className="bg-custom-background">
-      {pantries.map((pantry) => {
-        // Ensure pantryKey matches a valid key in the Images object
-        const pantryKey = pantry.imageSource?.toLowerCase() as PantryKeys; // Assume pantry.category holds the category
-
-        return (
-          <View key={pantry.pantryId} className="mt-5">
-            <PantryButton 
-              title={pantry.pantryName!} 
-              onPress={() => router.push(`./individualpantry?pantryId=${pantry.pantryId}`)}
-              imageSource={Images[pantryKey] || Images.other} // Fix syntax issue here
+          <View style={{ width: 300, padding: 20, backgroundColor: 'white', borderRadius: 10 }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Add New Pantry</Text>
+            <TextInput
+              placeholder="Pantry Name"
+              value={pantryName}
+              onChangeText={setPantryName}
+              style={{
+                borderRadius: 8,
+                padding: 8,
+                borderWidth: 1,
+              }}
+              placeholderTextColor="#000"
             />
+            <Dropdown
+              style={{
+                borderRadius: 8,
+                padding: 8,
+                marginTop: 10,
+                borderWidth: 1,
+                borderColor: '#000',
+              }}
+              placeholderStyle={{ color: '#000', fontSize: 14 }}
+              selectedTextStyle={{ color: '#000', fontSize: 14 }}
+              data={pantryImages}
+              labelField="label"
+              valueField="value"
+              placeholder="Location"
+              value={pantryImage}
+              onFocus={() => setPantryImagesOpen(true)}
+              onBlur={() => setPantryImagesOpen(false)}
+              onChange={(item) => {
+                setPantryImage(item.value);
+                setPantryImagesOpen(false);
+              }}
+              maxHeight={200}
+            />
+            {/* Submit Button */}
+            <TouchableOpacity
+              onPress={submitPantry}
+              style={{
+                padding: 10,
+                backgroundColor: Colors.darkerGreen,
+                borderRadius: 5,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>Add Pantry</Text>
+            </TouchableOpacity>
+            {/* Close Button */}
+            <TouchableOpacity onPress={handleCancelAdd} style={{ marginTop: 10, alignItems: 'center' }}>
+              <Text style={{ color: 'grey' }}>Cancel</Text>
+            </TouchableOpacity>
           </View>
-        );
-      })}
-    </ScrollView>
+        </View>
+      </Modal>
+      {/* Pantry List */}
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 15 }} className="bg-custom-background">
+        {pantries.map((pantry) => {
+          const pantryKey = pantry.imageSource?.toLowerCase() as PantryKeys;
+          return (
+            <View key={pantry.pantryId} className="mt-5">
+              <PantryButton
+                title={pantry.pantryName!}
+                onPress={() => router.push(`./individualpantry?pantryId=${pantry.pantryId}`)}
+                imageSource={Images[pantryKey] || Images.other}
+              />
+            </View>
+          );
+        })}
+      </ScrollView>
     </View>
   );
 };

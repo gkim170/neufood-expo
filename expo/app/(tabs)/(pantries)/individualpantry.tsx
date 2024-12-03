@@ -7,8 +7,8 @@ import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
 import axios, { AxiosError } from 'axios';
 import { useLocalSearchParams } from 'expo-router';
+import { useAuth } from '@/components/AuthContext'; // Import the AuthContext
 
-const UID = "user-1729689547676"; //for me aka long thor :)
 const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface ErrorResponse {
@@ -64,6 +64,7 @@ type ImageKeys =  'protein' | 'dairy' | 'fruits' | 'vegetables' | 'grains' | 'pr
 
 const IndividualPantry = () => {
   // State to control modal visibility and other components within handlers
+  const { uid } = useAuth(); // Use AuthContext to get the UID
   const [pantries, setPantries] = useState<PantryDetails[]>([]);
   const [selectedPantryId, setSelectedPantryId] = useState<string | undefined>(undefined); // Set default selected pantry to be NONE
   const [modalVisible, setModalVisible] = useState(false);
@@ -98,7 +99,7 @@ const IndividualPantry = () => {
     try {
       // Send the get request to the database to get pantry ids
       // Have to replace the constant UID with the user's actual ID eventually
-      const response = await axios.get(`${url}/users/${UID}/retrievePantries`);
+      const response = await axios.get(`${url}/users/${uid}/retrievePantries`);
       const pantryIds = response.data;
       
       // Get the pantry names from the retrievePantryDetails function
