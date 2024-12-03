@@ -17,31 +17,47 @@ const Generated = () => {
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
   const [healthPreferences, setHealthPreferences] = useState('');
-  const [diet, setDiet] = useState('balanced');  // there are other options for things to filter edamam api request by, look at edamam documentation to see
+  const [diet, setDiet] = useState('balanced');  // there are other options for things to filter Edamam api request by, look at Edamam documentation to see
   const url = process.env.EXPO_PUBLIC_API_URL;
 
+  // Fetch user allergies and format the health preferences string to add as a parameter in Edamam API Request
   useEffect(() => {
     const fetchHealthPreferences = async () => {
       try {
         const response = await fetch(`${url}/users/${userId}/`); // Fetch user data by userId
         const userData = await response.json();
-
-        // Map allergies into `health` parameters
-        const formattedHealthPreferences = userData.allergies
-          .map((allergy: string) => `health=${encodeURIComponent(allergy)}`) // Format each health label as health=allergy because that is what the Edamam request expects 
-          .join('&'); // Join with '&' for separate parameters
-
+  
+        console.log("User allergies: ", userData.allergies);
+  
+        // Extract allergy Ids from userData
+        const allergyIds = userData.allergies.map((allergy) => allergy[0]);
+        console.log("Allergy Ids: ", allergyIds);
+  
+        // Get the allergy name strings from each Allergy Id
+        const allergyNames = await Promise.all(
+          allergyIds.map(async (id) => {
+            const allergyResponse = await fetch(`${url}/allergies/${id}`);
+            const allergyData = await allergyResponse.json();
+            return allergyData.name; 
+          })
+        );
+  
+        // Format health preferences (allergies) as a string
+        // This is the format Edamam expects &heath=preference&health=preference&health=preference and so on
+        // Can see this in the Edamam Documentation
+        const formattedHealthPreferences = allergyNames
+          .map((name) => `health=${encodeURIComponent(name)}`)
+          .join('&'); 
+  
         console.log('Health Preferences:', formattedHealthPreferences);
         setHealthPreferences(formattedHealthPreferences);
-        } catch (error) {
-          console.error('Error fetching user allergies:', error);
-        }
+      } catch (error) {
+        console.error('Error fetching user allergies:', error);
+      }
     };
   
     fetchHealthPreferences();
   }, [userId]);
-
-
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -50,7 +66,7 @@ const Generated = () => {
           const response = await fetch(`${url}/pantries/${pantryId}`);  // Get info from pantry by pantryID
           const pantry = await response.json();
       
-          // put ingredients in format needed to pass into the edamam api request
+          // Put ingredients in format needed to pass into the Edamam api request
           const formattedIngredients = pantry.ingredients
           .map((ingredient: { name: string }) => encodeURIComponent(ingredient.name)) // Encode each ingredient
           .join('%2C%20'); // Join with "%2C%20" (comma and space)
@@ -79,7 +95,8 @@ const Generated = () => {
     const fetchRecipes = async () => {
       setLoading(true);  // Set loading to true before starting fetch
       try {
-        const response = await fetch(getRecipesSearchRequestURL(query, diet)); // Make the API request using the constructed URL with query and diet parameters
+        console.log("Edamam API Request: ", getRecipesSearchRequestURL(query, diet, healthPreferences));
+        const response = await fetch(getRecipesSearchRequestURL(query, diet, healthPreferences)); // Make the API request using the constructed URL with query and diet parameters
         const data = await response.json(); // Parse the JSON response from the API
         console.log("Edamam API Response:", data); // Logging the response for development purposes
         setRecipes(data.hits.map(hit => hit.recipe)); // If the request is successful, update the state with the fetched recipes
@@ -87,7 +104,7 @@ const Generated = () => {
         console.error("Error fetching response:", error);
         setError(error);
       } finally {
-        setLoading(false);  // Set loading to false after the fetch completes
+        setLoading(false); // Set loading to false after the fetch completes
       }
     };
     fetchRecipes();
