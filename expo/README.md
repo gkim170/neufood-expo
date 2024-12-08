@@ -42,7 +42,7 @@ In the output, you'll find options to open the app in a
 
 ## Usage
 
-At the moment, the app contains introductory pages that can be swiped through. These will eventually lead to different tabs within the app where users can access features like ingredient tracking and recipe recommendations.
+At the moment, the app contains introductory pages that can be swiped through. You can create an account that will allow you to sign in later. Once signed in, there are different tabs within the app where users can access features like ingredient tracking, recipe recommendations, and some profile information.
 
 ## Contributors
 

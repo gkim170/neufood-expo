@@ -8,9 +8,9 @@ import axios, { AxiosError } from 'axios';
 import RecipesPantryButton from '@/components/RecipesPantryButton';
 import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
+import { useLocalSearchParams } from 'expo-router';
+import { useAuth } from "@/components/AuthContext"; // Import the AuthContext
 
-const UID = "333";
-const url = process.env.EXPO_PUBLIC_API_URL;
 
 interface ErrorResponse {
   message: string;
@@ -22,6 +22,9 @@ interface PantryDetails {
 }
 
 const Selection = () => {
+  // const uid = "333"; // This is a UID that is in the database to use for testing if needed, or if issued with getting uid
+  const { uid } = useAuth(); // Use AuthContext to get the uid
+  const url = process.env.EXPO_PUBLIC_API_URL;
   const [pantries, setPantries] = useState<PantryDetails[]>([]);
   const [selectedPantryId, setSelectedPantryId] = useState<string | null>(null); // State to keep track of selected pantry, there can only be one and you have to pick one
 
@@ -36,8 +39,8 @@ const Selection = () => {
   const pantryListRetriever = async () => {
     try {
       // Send the get request to the database to get pantry ids
-      // Have to replace the constant UID with the user's actual ID eventually
-      const response = await axios.get(`${url}/users/${UID}/retrievePantries`);
+      // Have to replace the constant uid with the user's actual ID eventually
+      const response = await axios.get(`${url}/users/${uid}/retrievePantries`);
       const pantryIds = response.data;
       console.log("Pantry IDs:", pantryIds);
       
@@ -125,7 +128,7 @@ const Selection = () => {
               pathname: './generated',
               params: { 
                 pantryId: selectedPantryId,
-                userId: UID
+                userId: uid
               }, // Pass the pantry id and user id when button is pressed
             });
           } else {

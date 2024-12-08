@@ -95,7 +95,6 @@ const Generated = () => {
     const fetchRecipes = async () => {
       setLoading(true);  // Set loading to true before starting fetch
       try {
-        console.log("Edamam API Request: ", getRecipesSearchRequestURL(query, diet, healthPreferences));
         const response = await fetch(getRecipesSearchRequestURL(query, diet, healthPreferences)); // Make the API request using the constructed URL with query and diet parameters
         const data = await response.json(); // Parse the JSON response from the API
         console.log("Edamam API Response:", data); // Logging the response for development purposes
@@ -108,7 +107,7 @@ const Generated = () => {
       }
     };
     fetchRecipes();
-  }, [query, diet]);
+  }, [query, diet, healthPreferences]); // When you add parameters to getRecipesSearchRequestURL(), make sure you add them here so recipes are regenerated when there are updated to the API request
 
 
   // If there's an error, display a message on the page for the user
