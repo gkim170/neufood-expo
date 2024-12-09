@@ -27,7 +27,7 @@ const pantryimages = [
   { label: 'Office', value: 'Office' },
   { label: 'Office2', value: 'Office2' },
 ];
-type PantryKeys =  'Apartment' | 'Dorm' | 'House' | 'Office' | 'Office2';
+type PantryKeys =  'apartment' | 'dorm' | 'house' | 'office' | 'office2';
 
 const Pantries = () => {
     // stuff for adding pantry via modal (i like this better than navigating to multiple pages where data can be lost in transfer)
@@ -283,7 +283,7 @@ const Pantries = () => {
           <View key={pantry.pantryId} className="mt-5">
             <PantryButton 
               title={pantry.pantryName!} 
-              onPress={() => router.push(`./individualpantry?pantryId=${pantry.pantryId}`)}
+              onPress={() => router.navigate(`./individualpantry?pantryId=${pantry.pantryId}`)}
               imageSource={Images[pantryKey] || Images.other} // Fix syntax issue here
             />
           </View>

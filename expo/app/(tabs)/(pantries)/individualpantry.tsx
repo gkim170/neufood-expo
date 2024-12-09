@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, FlatList, Modal } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown'
 import DarkButton from '@/components/DarkButton';
-import BackArrow from '@/components/BackArrow';
+import { Ionicons } from '@expo/vector-icons';
 import Images from '@/constants/images';
 import { Colors } from '@/constants/Colors';
 import axios, { AxiosError } from 'axios';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams} from 'expo-router';
 
 const UID = "user-1729689547676"; //for me aka long thor :)
 const url = process.env.EXPO_PUBLIC_API_URL;
@@ -227,7 +227,15 @@ const handleUse = async (ingredient: Ingredient) => {
 
   return (
     <View className="flex-1 bg-custom-background p-4">
-      <BackArrow />
+      {/**currently this back arrow does not work, may want to change the .push to .navigate() in pantriesindex, then .popto()
+       * for the thought process of what router is just look at pantriesindex button to get here, or recipes -> generation
+       */}
+      <TouchableOpacity 
+        className="absolute left-4 top-25 p-2 z-10"
+        onPress={() => router.push(`./pantriesindex`)}
+      >
+        <Ionicons name="chevron-back" size={30} color="black" />
+      </TouchableOpacity>
       <View>
         {/** horizontal scrolling list of pantries populated by pantries data */}
         <FlatList<PantryDetails>
@@ -374,7 +382,8 @@ const handleUse = async (ingredient: Ingredient) => {
       ) : (
         // Ingredients view
         <View className="mt-4">
-          {/* Search bar needs to function tho*/}
+          {/* Search bar needs to function tho. currently it does not do anything, but the thought process is to show/hide ingredients that are already populated in the grid
+          based on the input*/}
           <TextInput
             placeholder="Search ingredients..."
             className="text-black bg-white rounded-md p-2 mb-4 border-gray-300"
@@ -435,6 +444,8 @@ const handleUse = async (ingredient: Ingredient) => {
                 
                 {/* Info Icon for Details */}
                 <TouchableOpacity
+                //this onpress should go to a function that visually flips an ingredient over. this is to show things such as the expiration date, total price, etc. that isn't already shown 
+                //    on the one page from the database retrieval. this should also have a "delete" button in the back that will hit a route to delete the whole stack of that ingredient from the DB, so we don't need to click 100000 times to delete an item from your pantry.
                   onPress={() => console.log("Flipping to details")}
                   style={{
                     position: 'absolute',
@@ -443,7 +454,7 @@ const handleUse = async (ingredient: Ingredient) => {
                   }}
                 >
                   <Image
-                    source={Images.infoIcon} // Replace with your actual icon path
+                    source={Images.infoIcon} // this is just some 'i' info icon, change to something higher quality probably.
                     style={{ width: 20, height: 20 }}
                   />
                 </TouchableOpacity>
